@@ -118,6 +118,7 @@ class Vetor {
                 mVetDados[i] = mVetDados[i+1];
             }
             mTamanho--;
+            mCapacidade++;
         }
 
         void DiferencaVetores(Vetor outroVetor) {
@@ -130,7 +131,19 @@ class Vetor {
             }
         }
 
-        //void Redimensionamento() {}
+        void Redimensionamento() {
+            data aux[mTamanho * 2];
+            for (unsigned i = 0; i < mTamanho; i++) {
+                aux[i] = mVetDados[i];
+            }
+            delete[] mVetDados;
+            mVetDados = new data[mTamanho * 2];
+            mCapacidade = mTamanho;
+            mTamanho = mTamanho * 2;
+            for (unsigned i = 0; i < mTamanho; i++) {
+                mVetDados[i] = aux[i];
+            }
+        }
 
         void InsereValor(unsigned pos, data valor) {
             for (unsigned i = mTamanho; i > pos; --i) {
@@ -138,6 +151,7 @@ class Vetor {
             }
             mVetDados[pos] = valor;
             mTamanho++;
+            mCapacidade--;
         }
         
         unsigned Tamanho() {
@@ -173,7 +187,12 @@ int main () {
         vetor.AlteraValor(i, valor);
     }
     vetor.Imprime();
-    vetor.OrdenaVetor(0, vetor.Tamanho());
+    vetor.Redimensionamento();
+    for (unsigned i = capacidade; i < (capacidade * 2); ++i) {
+        cout << "Entre com o valor" << endl;
+        cin >> valor;
+        vetor.AlteraValor(i, valor);
+    }
     vetor.Imprime();
 
     return 0;
