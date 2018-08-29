@@ -14,24 +14,26 @@ void ImprimeVetor(int vetor[], int tamanho) {
 }
 
 int main() {
-    int vetor[8], valor, tamanho = 0;
-    for (int i = 0; i < 8; ++i) {
+    int vetor[8], valor, tamanho = 1, pos;
+    bool naoAchou;
+    cin >> vetor[0];
+    ImprimeVetor(vetor, tamanho);
+    for (int i = 0; i < 7; ++i) {
         cin >> valor;
-        if (tamanho == 0) {
-            vetor[0] = valor;
-            ++tamanho;
-        } else {
-            for (int j = 0; j < tamanho; ++j) {
-                if (valor < vetor[j]) {
-                    for (int k = tamanho; k > j; --j) {
-                        vetor[k] = vetor[k-1];
-                    }
-                }
-                vetor[j] = valor;
-                j = tamanho;
+        pos = 0;
+        naoAchou = true;
+        while (naoAchou) {
+            if (vetor[pos] > valor) {
+                naoAchou = false;
+            } else {
+                ++pos;
             }
-            ++tamanho;
         }
+        for (int j = tamanho; j > pos; --j) {
+            vetor[j] = vetor[j-1];
+        }
+        vetor[pos] = valor;
+        ++tamanho;
         ImprimeVetor(vetor, tamanho);
     }
     return 0;
