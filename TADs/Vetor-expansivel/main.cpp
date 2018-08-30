@@ -120,20 +120,21 @@ class Vetor {
             }
         }
 
-        // Retorna o produto interno entre dois vetores
-        data ProdutoInterno(Vetor& outroVetor) {
-            data valor = 0;
-            for (unsigned i = 0; i < this->mTamanho; ++i) {
-                valor = valor + (this->mVetDados[i] * outroVetor.mVetDados[i]);
+        // Sobrecarga do operador * para o produto interno entre dois vetores
+        data operator*(const Vetor& outroVetor) {
+            data resultado = 0;
+            for (unsigned i = 0; i < mTamanho; ++i) {
+                resultado = resultado + (mVetDados[i] * outroVetor.mVetDados[i]);
             }
-            return valor;
+            return resultado;
         }
-
-        // Multiplica todos os valores do vetor por um número dado
-        void MultiplicaNumero(data num) {
+        
+        // Sobrecarga do operador * para a multiplicação do vetor por um número
+        Vetor& operator*(const data& num) {
             for (unsigned i = 0; i < mTamanho; ++i) {
                 mVetDados[i] = mVetDados[i] * num;
             }
+            return *this;
         }
 
         // Remove os valores duplicados do vetor
@@ -166,6 +167,7 @@ class Vetor {
             return *this;
         }
 
+        // Redimensionamento do vetor
         void Redimensionamento() {
             data* aux = new data[mTamanho * 2];
             for (unsigned i = 0; i < mTamanho; i++) {
@@ -176,6 +178,7 @@ class Vetor {
             mVetDados = aux;
         }
         
+        // Verifica se o vetor está cheio
         bool Cheio() {
             if (mCapacidade == 0) {
                 return true;
@@ -184,6 +187,7 @@ class Vetor {
             }
         }
 
+        // Insere no início do vetor
         void InsereInicio(data valor) {
             MoveDireita(0);
             mVetDados[0] = valor;
@@ -191,12 +195,14 @@ class Vetor {
             mCapacidade--;
         }
 
+        // Insere no final do vetor
         void InsereFinal(data valor) {
             mVetDados[mTamanho] = valor;
             ++mTamanho;
             mCapacidade--;
         }
 
+        // Insere um valor em uma dada posição do vetor
         void InserePos(unsigned pos, data valor) {
             if (Cheio()) {
                 Redimensionamento();
@@ -213,22 +219,26 @@ class Vetor {
             }
         }
 
+        // Move os valores à direita de uma posição
         void MoveDireita(unsigned pos) {
             for (unsigned i = mTamanho; i > pos; --i) {
                 mVetDados[i] = mVetDados[i-1];
             }
         }
 
+        // Move os valores à esquerda de uma posição
         void MoveEsquerda(unsigned pos) {
             for (unsigned i = pos; i < (mTamanho - 1); ++i) {
                 mVetDados[i] = mVetDados[i+1];
             }
         }
 
+        // Retorna o tamanho do vetor
         unsigned Tamanho() {
             return mTamanho;
         }
         
+        // Imprime o vetor
         void Imprime() {
             cout << "Vetor = [";
             for (unsigned i = 0; i < mTamanho; ++i) {
@@ -247,9 +257,9 @@ class Vetor {
 
 int main () {
     unsigned capacidade;
-    cout << "Entre com a capacidade do primeiro vetor" << endl;
+    cout << "Entre com a capacidade do vetor" << endl;
     cin >> capacidade;
-    Vetor vetor1(capacidade);
+    Vetor vetor1(capacidade), vetor2(capacidade);
     data valor;
 
     for (unsigned i = 0; i < capacidade; ++i) {
@@ -258,19 +268,14 @@ int main () {
         vetor1.AlteraValor(i, valor);
     }
     
-    cout << "Entre com a capacidade do segundo vetor" << endl;
-    cin >> capacidade;
-    Vetor vetor2(capacidade);
-    
     for (unsigned i = 0; i < capacidade; ++i) {
         cout << "Entre com o valor para o vetor" << endl;
         cin >> valor;
         vetor2.AlteraValor(i, valor);
     }
     
-    cout << "Diferença dos vetores" << endl;
-    vetor1 = vetor1 - vetor2;
-    vetor1.Imprime();
+    valor = vetor1 * vetor2;
+    cout << valor << endl;
 
     return 0;
 }
