@@ -27,11 +27,24 @@ using namespace std;
 
 class Vetor {
     public:
+        // Construtor padrão
         Vetor(unsigned capacidade)
-        : mVetDados(new data[capacidade]), mTamanho(capacidade),
-          mCapacidade(capacidade){ // inicializacao
+        : mVetDados(new data[capacidade]),
+          mTamanho(capacidade),
+          mCapacidade(capacidade) { // inicializacao
+        }
+        
+        // Construtor de cópia
+        Vetor(Vetor& vet) {
+            mTamanho = vet.mTamanho;
+            mCapacidade = 0;
+            mVetDados = new data[mTamanho];
+            for (unsigned i = 0; i < mTamanho; ++i) {
+                mVetDados[i] = vet.mVetDados[i];
+            }
         }
 
+        // Destrutor
         ~Vetor() {
             delete[] mVetDados;
             mTamanho = 0;
@@ -40,26 +53,42 @@ class Vetor {
         // Metodo para copiar vetor (vetor1 = vetor2)
         // Metodo para verificar equivalencia (vetor1 == vetor2)
 
+        // Retorna o valor de uma posição dada
         data Valor(unsigned pos) {
             data valor = mVetDados[pos];
             return valor;
         }
+        
+        // Verifica se um valor existe no vetor
+        bool Existe(data valor) {
+            for (unsigned i = 0; i < mTamanho; ++i) {
+                if (mVetDados[i] == valor) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
+        // Altera um valor de uma posição dada
         void AlteraValor(unsigned pos, data valor) {
             mVetDados[pos] = valor;
         }
 
+        // Retorna uma posição de um valor dado
         unsigned Posicao(data valor) {
-            for (unsigned i = 0; i < mTamanho; ++i) {
-                if (mVetDados[i] == valor) {
-                    return i;
+            if (Existe(valor)) {
+                for (unsigned i = 0; i < mTamanho; ++i) {
+                    if (mVetDados[i] == valor) {
+                        return i;
+                    }
                 }
             }
-            cout << "O valor não existe no vetor" << endl;
         }
 
+        // Ordena o vetor com o método QuickSort
         void OrdenaVetor(unsigned inicio, unsigned fim) {
-            unsigned i, j, pivo, aux;
+            unsigned i, j;
+            data pivo, aux;
             i = inicio;
             j = fim - 1;
             pivo = mVetDados[(inicio + fim) / 2];
@@ -91,6 +120,7 @@ class Vetor {
             }
         }
 
+        // Retorna o produto interno entre dois vetores
         data ProdutoInterno(Vetor& outroVetor) {
             data valor = 0;
             for (unsigned i = 0; i < this->mTamanho; ++i) {
@@ -99,12 +129,14 @@ class Vetor {
             return valor;
         }
 
-        void MultiplicaNumero(int num) {
+        // Multiplica todos os valores do vetor por um número dado
+        void MultiplicaNumero(data num) {
             for (unsigned i = 0; i < mTamanho; ++i) {
                 mVetDados[i] = mVetDados[i] * num;
             }
         }
 
+        // Remove os valores duplicados do vetor
         void RemoveDuplicados() {
             for (unsigned pos1 = 0; pos1 < mTamanho; pos1++) {
                 for (unsigned pos2 = pos1 + 1; pos2 < mTamanho; pos2++) {
@@ -115,13 +147,15 @@ class Vetor {
             }
         }
 
+        // Remove o valor de uma posição dada
         void RemoveValor(unsigned pos) {
             MoveEsquerda(pos);
             mTamanho--;
             mCapacidade++;
         }
 
-        void DiferencaVetores(Vetor& outroVetor) {
+        // Sobrecarga do operador - para a implementação da diferença de vetores
+        Vetor& operator-(const Vetor& outroVetor) {
             for (unsigned pos1 = 0; pos1 < mTamanho; pos1++) {
                 for (unsigned pos2 = 0; pos2 < outroVetor.mTamanho; pos2++) {
                     if (mVetDados[pos1] == outroVetor.mVetDados[pos2]) {
@@ -129,6 +163,7 @@ class Vetor {
                     }
                 }
             }
+            return *this;
         }
 
         void Redimensionamento() {
@@ -212,9 +247,9 @@ class Vetor {
 
 int main () {
     unsigned capacidade;
-    cout << "Entre com a capacidade do vetor" << endl;
+    cout << "Entre com a capacidade do primeiro vetor" << endl;
     cin >> capacidade;
-    Vetor vetor1(capacidade), vetor2(capacidade);
+    Vetor vetor1(capacidade);
     data valor;
 
     for (unsigned i = 0; i < capacidade; ++i) {
@@ -223,10 +258,19 @@ int main () {
         vetor1.AlteraValor(i, valor);
     }
     
-    for (unsigned i = 1; i < 4; ++i) {
-        vetor1.MultiplicaNumero(i);
-        vetor1.Imprime();
+    cout << "Entre com a capacidade do segundo vetor" << endl;
+    cin >> capacidade;
+    Vetor vetor2(capacidade);
+    
+    for (unsigned i = 0; i < capacidade; ++i) {
+        cout << "Entre com o valor para o vetor" << endl;
+        cin >> valor;
+        vetor2.AlteraValor(i, valor);
     }
+    
+    cout << "Diferença dos vetores" << endl;
+    vetor1 = vetor1 - vetor2;
+    vetor1.Imprime();
 
     return 0;
 }
