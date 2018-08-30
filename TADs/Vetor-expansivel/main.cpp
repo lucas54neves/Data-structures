@@ -16,6 +16,8 @@ sem precisar de redimensionamento.
  
  // Função retorna um valor
  // Procedimento altera o estado, não retorna um valor
+ // Funções: o nome descreve o resultado
+ // Procedimentos: o nome é um verbo no infinitivo (ou imperativo) que descreve a ação
 
 #include <iostream>
 
@@ -38,7 +40,7 @@ class Vetor {
         // Metodo para copiar vetor (vetor1 = vetor2)
         // Metodo para verificar equivalencia (vetor1 == vetor2)
 
-        data ObtemValor(unsigned pos) {
+        data Valor(unsigned pos) {
             data valor = mVetDados[pos];
             return valor;
         }
@@ -47,13 +49,13 @@ class Vetor {
             mVetDados[pos] = valor;
         }
 
-        unsigned BuscaValor(int valor) {
+        unsigned Posicao(data valor) {
             for (unsigned i = 0; i < mTamanho; ++i) {
                 if (mVetDados[i] == valor) {
                     return i;
                 }
             }
-            return -1;
+            cout << "O valor não existe no vetor" << endl;
         }
 
         void OrdenaVetor(unsigned inicio, unsigned fim) {
@@ -89,10 +91,10 @@ class Vetor {
             }
         }
 
-        data ProdutoInterno(Vetor outroVetor) {
+        data ProdutoInterno(Vetor& outroVetor) {
             data valor = 0;
-            for (unsigned i = 0; i < mTamanho; ++i) {
-                valor = valor + (mVetDados[i] * outroVetor.mVetDados[i]);
+            for (unsigned i = 0; i < this->mTamanho; ++i) {
+                valor = valor + (this->mVetDados[i] * outroVetor.mVetDados[i]);
             }
             return valor;
         }
@@ -114,14 +116,12 @@ class Vetor {
         }
 
         void RemoveValor(unsigned pos) {
-            for (unsigned i = pos; i < (mTamanho - 1); ++i) {
-                mVetDados[i] = mVetDados[i+1];
-            }
+            MoveEsquerda(pos);
             mTamanho--;
             mCapacidade++;
         }
 
-        void DiferencaVetores(Vetor outroVetor) {
+        void DiferencaVetores(Vetor& outroVetor) {
             for (unsigned pos1 = 0; pos1 < mTamanho; pos1++) {
                 for (unsigned pos2 = 0; pos2 < outroVetor.mTamanho; pos2++) {
                     if (mVetDados[pos1] == outroVetor.mVetDados[pos2]) {
@@ -132,28 +132,64 @@ class Vetor {
         }
 
         void Redimensionamento() {
-            data aux[mTamanho * 2];
+            data* aux = new data[mTamanho * 2];
             for (unsigned i = 0; i < mTamanho; i++) {
                 aux[i] = mVetDados[i];
             }
             delete[] mVetDados;
-            mVetDados = new data[mTamanho * 2];
-            mCapacidade = mTamanho;
-            mTamanho = mTamanho * 2;
-            for (unsigned i = 0; i < mTamanho; i++) {
-                mVetDados[i] = aux[i];
+            mCapacidade = mTamanho * 2;
+            mVetDados = aux;
+        }
+        
+        bool Cheio() {
+            if (mCapacidade == 0) {
+                return true;
+            } else {
+                return false;
             }
         }
 
-        void InsereValor(unsigned pos, data valor) {
-            for (unsigned i = mTamanho; i > pos; --i) {
-                mVetDados[i+1] = mVetDados[i];
-            }
-            mVetDados[pos] = valor;
-            mTamanho++;
+        void InsereInicio(data valor) {
+            MoveDireita(0);
+            mVetDados[0] = valor;
+            ++mTamanho;
             mCapacidade--;
         }
-        
+
+        void InsereFinal(data valor) {
+            mVetDados[mTamanho] = valor;
+            ++mTamanho;
+            mCapacidade--;
+        }
+
+        void InserePos(unsigned pos, data valor) {
+            if (Cheio()) {
+                Redimensionamento();
+            }
+            if (pos == 0) {
+                InsereInicio(valor);
+            } else if (pos == mTamanho) {
+                InsereFinal(valor);
+            } else {
+                MoveDireita(pos);
+                mVetDados[pos] = valor;
+                mTamanho++;
+                mCapacidade--;
+            }
+        }
+
+        void MoveDireita(unsigned pos) {
+            for (unsigned i = mTamanho; i > pos; --i) {
+                mVetDados[i] = mVetDados[i-1];
+            }
+        }
+
+        void MoveEsquerda(unsigned pos) {
+            for (unsigned i = pos; i < (mTamanho - 1); ++i) {
+                mVetDados[i] = mVetDados[i+1];
+            }
+        }
+
         unsigned Tamanho() {
             return mTamanho;
         }
@@ -176,24 +212,21 @@ class Vetor {
 
 int main () {
     unsigned capacidade;
-    cout << "Entre com a capacidade do primeiro vetor" << endl;
+    cout << "Entre com a capacidade do vetor" << endl;
     cin >> capacidade;
-    Vetor vetor(capacidade);
+    Vetor vetor1(capacidade), vetor2(capacidade);
     data valor;
 
     for (unsigned i = 0; i < capacidade; ++i) {
-        cout << "Entre com o valor" << endl;
+        cout << "Entre com o valor para o vetor" << endl;
         cin >> valor;
-        vetor.AlteraValor(i, valor);
+        vetor1.AlteraValor(i, valor);
     }
-    vetor.Imprime();
-    vetor.Redimensionamento();
-    for (unsigned i = capacidade; i < (capacidade * 2); ++i) {
-        cout << "Entre com o valor" << endl;
-        cin >> valor;
-        vetor.AlteraValor(i, valor);
+    
+    for (unsigned i = 1; i < 4; ++i) {
+        vetor1.MultiplicaNumero(i);
+        vetor1.Imprime();
     }
-    vetor.Imprime();
 
     return 0;
 }
