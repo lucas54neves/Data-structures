@@ -75,26 +75,31 @@ void lista::insere(Dado dado) {
 
 // insere um dado em uma determinada posição da lista
 void lista::insere(Dado dado, int posicao) {
-    if (posicao >= 0 && posicao < tamanho) {
+    if (posicao >= 0 && posicao <= tamanho) {
         noh* novo = new noh(dado);
-        if (posicao == 0) {
-            novo->proximo = primeiro;
+        
+        if (vazia()) {
             primeiro = novo;
-        } else if (posicao == (tamanho - 1)) {
+            ultimo = novo;
+        } else if (posicao == 0) {
+            novo->proximo = novo;
+            primeiro = novo;
+        } else if (posicao == tamanho) {
             ultimo->proximo = novo;
             ultimo = novo;
         } else {
-            int posAux = 0;
             noh* aux = primeiro;
-            noh* anterior;
-            while (posAux <= posicao) {
-                anterior = aux;
+            int posAux = 0;
+            
+            while (posAux != (posicao - 1)) {
                 aux = aux->proximo;
                 ++posAux;
             }
-            anterior->proximo = novo;
-            novo->proximo = aux;
+            
+            novo->proximo = aux->proximo;
+            aux->proximo = novo;
         }
+        
         ++tamanho;
     }
 }
