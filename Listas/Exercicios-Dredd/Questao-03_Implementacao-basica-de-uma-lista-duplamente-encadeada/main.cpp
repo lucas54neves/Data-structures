@@ -34,6 +34,19 @@ class Lista {
             return (mTamanho == 0);
         }
         
+        bool Existe(unsigned int matricula) {
+            Aluno* aux = mPrimeiro;
+            
+            while (aux != nullptr) {
+                if (aux->mMatricula == matricula) {
+                    return true;
+                }
+                aux = aux->mProximo;
+            }
+            
+            return false;
+        }
+        
         void Inserir (unsigned int matricula, string nome) {
             Aluno* novo = new Aluno(matricula, nome);
             if (Vazia()) {
@@ -48,39 +61,37 @@ class Lista {
         }
         
         void Remover (unsigned int matricula) {
-            Aluno* temp = mPrimeiro;
-            unsigned int posTemp = 0;
-            
-            while (temp->mMatricula != matricula) {
-                temp = temp->mProximo;
-                ++posTemp;
-            }
-            
-            if (temp == mPrimeiro) {
-                mPrimeiro = temp->mProximo;
-                mPrimeiro->mAnterior = nullptr;
-            } else if (temp == mUltimo) {
-                mUltimo = temp->mAnterior;
-                mUltimo->mProximo = nullptr;
-            } else {
-                temp->mAnterior->mProximo = temp->mProximo;
-                temp->mProximo->mAnterior = temp->mAnterior;
-            }
-            
-            delete temp;
-            --mTamanho;
+            if (Existe(matricula)) {
+                Aluno* temp = mPrimeiro;
+                
+                while (temp->mMatricula != matricula) {
+                    temp = temp->mProximo;
+                }
+                
+                if (temp == mPrimeiro) {
+                    mPrimeiro = temp->mProximo;
+                    mPrimeiro->mAnterior = nullptr;
+                } else if (temp == mUltimo) {
+                    mUltimo = temp->mAnterior;
+                    mUltimo->mProximo = nullptr;
+                } else {
+                    temp->mAnterior->mProximo = temp->mProximo;
+                    temp->mProximo->mAnterior = temp->mAnterior;
+                }
+                
+                delete temp;
+                --mTamanho;
+                } else {
+                    cout << "ERRO" << endl;
+                }
         }
         
         void EscreverDiretamente() {
             Aluno* aux = mPrimeiro;
             
-            if (mTamanho == 1) {
-                cout << aux->mMatricula << " " << aux->mNome;
-            } else {
-                do {
-                    cout << aux->mMatricula << " " << aux->mNome << " ";
-                    aux = aux->mProximo;
-                } while (aux != nullptr);
+            while (aux != nullptr) {
+                cout << aux->mMatricula << " " << aux->mNome << " ";
+                aux = aux->mProximo;
             }
             
             cout << endl;
@@ -89,13 +100,9 @@ class Lista {
         void EscreverInversamente() {
             Aluno* aux = mUltimo;
             
-            if (mTamanho == 1) {
-                cout << aux->mMatricula << " " << aux->mNome;
-            } else {
-                do {
-                    cout << aux->mMatricula << " " << aux->mNome << " ";
-                    aux = aux->mAnterior;
-                } while (aux != nullptr);
+            while (aux != nullptr) {
+                cout << aux->mMatricula << " " << aux->mNome << " ";
+                aux = aux->mAnterior;
             }
             cout << endl;
         }
