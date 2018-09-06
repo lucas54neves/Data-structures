@@ -47,6 +47,7 @@ class Lista {
             return false;
         }
         
+        // Insere no início
         void Inserir (unsigned int matricula, string nome) {
             Aluno* novo = new Aluno(matricula, nome);
             if (Vazia()) {
@@ -70,20 +71,21 @@ class Lista {
                 
                 if (temp == mPrimeiro) {
                     mPrimeiro = temp->mProximo;
-                    mPrimeiro->mAnterior = nullptr;
-                } else if (temp == mUltimo) {
-                    mUltimo = temp->mAnterior;
-                    mUltimo->mProximo = nullptr;
                 } else {
                     temp->mAnterior->mProximo = temp->mProximo;
+                }
+                
+                if (temp == mUltimo) {
+                    mUltimo = temp->mAnterior;
+                } else {
                     temp->mProximo->mAnterior = temp->mAnterior;
                 }
                 
                 delete temp;
                 --mTamanho;
-                } else {
-                    cout << "ERRO" << endl;
-                }
+            } else {
+                cout << "ERRO" << endl;
+            }
         }
         
         void EscreverDiretamente() {
@@ -112,18 +114,21 @@ class Lista {
         unsigned int mTamanho;
         
         void RemoverTodos() {
-            Aluno* aux = mPrimeiro;
-            Aluno* temp;
-            
-            while (aux != mUltimo) {
-                aux = aux->mProximo;
-                temp = aux;
-                delete temp;
+            if (!Vazia()) {
+                Aluno* aux = mPrimeiro;
+                Aluno* temp;
+                
+                while (aux != mUltimo) {
+                    aux = aux->mProximo;
+                    temp = aux;
+                    delete temp;
+                }
+                delete aux;
+                
+                mPrimeiro = nullptr;
+                mUltimo = nullptr;
+                mTamanho = 0;
             }
-            delete aux;
-            
-            mPrimeiro = nullptr;
-            mUltimo = nullptr;
         }
 };
 
