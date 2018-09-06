@@ -73,12 +73,14 @@ class listadup {
                 temp = aux;
                 if (temp == primeiro) {
                     primeiro = temp->proximo;
-                    primeiro->anterior = NULL;
-                } else if (temp == ultimo) {
-                    ultimo = temp->anterior;
-                    ultimo->proximo = NULL;
                 } else {
                     temp->anterior->proximo = temp->proximo;
+                } 
+                
+                
+                if (temp == ultimo) {
+                    ultimo = temp->anterior;
+                } else {
                     temp->proximo->anterior = temp->anterior;
                 }
                 
