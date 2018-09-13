@@ -4,10 +4,17 @@ typedef int Dado;
 
 class Noh {
     friend class Pilha;
+    public:
+        Noh(Dado d);
     private:
         Dado mDado; // poderia ser outro tipo de variável
         Noh* mPtProx;
 };
+
+Noh::Noh(Dado d) {
+    mDado = d;
+    mPtProx = NULL;
+}
 
 class Pilha {
     public:
@@ -36,24 +43,51 @@ class Pilha {
 using namespace std;
 
 Pilha::Pilha() {
+    mPtTopo = NULL;
+    mTamanho = 0;
 }
 
 Pilha::~Pilha() {
+    LimparTudo();
 }
 
 Dado Pilha::Desempilhar() {
+    Noh* temp = mPtTopo;
+    Dado removido = temp->mDado;
+    mPtTopo = mPtTopo->mPtProx;
+    delete temp;
+    --mTamanho;
+    return removido;
 }
 
 void Pilha::Empilhar(const Dado& d) {
+    Noh* novo = new Noh(d);
+    if (Vazia()) {
+        mPtTopo = novo;
+    } else {
+        novo->mPtProx = mPtTopo;
+        mPtTopo = novo;
+    }
+    ++mTamanho;
 }
 
 void Pilha::LimparTudo() {
+    Noh* temp;
+    while (mPtTopo != NULL) {
+        temp = mPtTopo;
+        mPtTopo = mPtTopo->mPtProx;
+        delete temp;
+    }
+    mTamanho = 0;
+    mPtTopo = NULL;    
 }
 
 Dado Pilha::Topo() const {
+    return mPtTopo->mDado;
 }
 
 bool Pilha::Vazia() {
+    return (mTamanho == 0);
 }
 
 int main() {
