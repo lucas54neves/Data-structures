@@ -21,30 +21,27 @@ public:
     void Info();  // imprime informações da pilha (tamanho e  posição do topo)
 };
 
-PilhaV::PilhaV(int cap = 100) {
+PilhaV::PilhaV(int cap) {
     mDados = new Dado[cap];
     mTamanho = 0;
     mCapacidade = cap;
-    mPosTopo = 0;
+    mPosTopo = -1;
 }
 
 PilhaV::~PilhaV() {
-    while (mTamanho != 0) {
-        --mPosTopo;
-        --mTamanho;
-        ++mCapacidade;
-    }
-    delete mDados[];
+    delete[] mDados;
 }
 
 void PilhaV::Empilhar(Dado valor) {
-    mDados[mPosTopo + 1] = valor
+    mDados[mPosTopo + 1] = valor;
+    ++mPosTopo;
     ++mTamanho;
     --mCapacidade;
 }
 
 Dado PilhaV::Desempilhar() {
     --mPosTopo;
+    --mTamanho;
     return mDados[mPosTopo+1];
 }
 
@@ -73,7 +70,7 @@ int main() {
     }
     
     for (int i = 0; i < 3; ++i) {
-        cout << minhaPilha.Desempilhar(valor) << endl;
+        cout << minhaPilha.Desempilhar() << endl;
     }
     
     for (int i = 0; i < 4; ++i) {
@@ -82,7 +79,7 @@ int main() {
     }
     
     for (int i = 0; i < 3; ++i) {
-        cout << minhaPilha.Desempilhar(valor) << endl;
+        cout << minhaPilha.Desempilhar() << endl;
     }
     
     cout << minhaPilha.Espiar() << endl;
