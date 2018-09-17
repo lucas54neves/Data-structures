@@ -32,33 +32,77 @@ class Fila {
 using namespace std;
 
 Fila::Fila(unsigned cap) { // cap tem valor default
+    mDados = new Dado[mCapacidade];
+    mCapacidade = cap;
+    mPosInicio = -1;
+    mPosFim = -1;
+    mTamanho = 0;
 }
 
 Fila::~Fila() {
+    delete[] mDados;
 }
 
 // Remove e retorna o próximo elemento da fila.
 Dado Fila::Desenfileira() {
+    if (mPosInicio == mCapacidade - 1) {
+        mPosInicio = 0;
+        return mDados[mCapacidade - 1];
+    } else {
+        ++mPosFim;
+    }
+    --mTamanho;
+    return mDados[mPosInicio - 1];
 }
 
 // Insere um valor na fila. Retorna um booleano que informa se a inserção foi realmente realizada.
 bool Fila::Enfileirar(const Dado& valor) {
+    if ((mPosFim + mCapacidade - mPosInicio) == (mCapacidade - 1)) {
+        return false;
+    } else if (Vazia()) {
+        mDados[0] = valor;
+        mPosInicio = 0;
+        mPosFim = 0;
+    } else if ((mPosFim) == (mCapacidade - 1)){
+        mDados[0] = valor;
+        mPosFim = 0;
+    } else {
+        ++mPosFim;
+        mDados[mPosFim] = valor;
+    }
+    ++mTamanho;
+    return true;
 }
 
 // Escreve todo o conteúdo do armazenamento (começando da posição zero) da fila na saída de dados.
 void Fila::EscreverConteudo(ostream& saida) const {
+    unsigned i = mPosInicio;
+    while (i != (mPosFim + 1)) {
+        if (i == mCapacidade) {
+            i = 0;
+        }
+        saida << mDados[i] << " ";
+        ++i;
+    }
+    saida << endl;
 }
 
 // Retorna tamanho, capacidade, inicio e fim da fila.
 void Fila::Info(unsigned* ptTam, unsigned* ptCap, unsigned* ptIni, unsigned* ptFim) const {
+    *ptTam = mTamanho;
+    *ptCap = mCapacidade;
+    *ptIni = mPosInicio;
+    *ptFim = mPosFim;
 }
 
 // Retorna o primeiro elemento da fila, sem removê-lo.
 Dado Fila::Proximo() const {
+    return (mDados[mPosInicio]);
 }
 
 // Consulta se a fila está vazia.
 bool Fila::Vazia() const {
+    return (mTamanho == 0);
 }
 
 int main() {
