@@ -17,6 +17,7 @@ noh::noh(Texto p) : palavra(p) {
     proximo = NULL;
 }
 
+
 class lista {
     private:
         noh* primeiro;
