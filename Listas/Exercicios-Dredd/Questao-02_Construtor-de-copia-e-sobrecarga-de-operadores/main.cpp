@@ -58,7 +58,7 @@ void lista::removerTodos() {
     
     while (inter != NULL) {
         removido = inter;
-        inter = primeiro->proximo;
+        inter = inter->proximo;
         delete removido;
     }
     delete inter;
