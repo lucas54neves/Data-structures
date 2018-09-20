@@ -33,7 +33,7 @@ class fila {
 		bool vazia();
 		void imprime();  
 		fila operator+(const fila& umaFila) const;
-                fila& operator=(const fila& umaFila);
+        fila& operator=(const fila& umaFila);
 };
 
 fila::fila() {
@@ -96,18 +96,57 @@ void fila::imprime(){
 
 //mesclar filas
 fila fila::operator+(const fila& umaLista) const {
-	// IMPLEMENTAR
-
+	noh* inter1 = this->primeiro;
+	noh* inter2 = umaLista.primeiro;
+	fila resultado;
+	
+	while (inter1 != NULL || inter2 != NULL) {
+	    if (inter1 == NULL) {
+	        resultado.enfileira(inter2->dado);
+	        inter2 = inter2->prox;
+	    } else if (inter2 == NULL) {
+	        resultado.enfileira(inter1->dado);
+	        inter1 = inter1->prox;
+	    } else if (inter1->dado < inter2->dado) {
+	        resultado.enfileira(inter1->dado);
+	        inter1 = inter1->prox;
+	    } else {
+	        resultado.enfileira(inter2->dado);
+	        inter2 = inter2->prox;
+	    }
+	}
+	
+	return resultado;
 }
 
 // sobrecarga do operador de atribuição
 fila& fila::operator=(const fila& umaFila){
-	// IMPLEMENTAR
+	while (not this->vazia()) {
+	    this->desenfileira();
+	}
+	
+    noh* inter = umaFila.primeiro;
+    
+    while (inter != NULL) {
+       this->enfileira(inter->dado);
+       inter = inter->prox;
+    }
+	
+	return *this;
 }
 
 // construtor de cópia
 fila::fila(const fila& umaFila) {
-	// IMPLEMENTAR
+	while (not this->vazia()) {
+	    this->desenfileira();
+	}
+	
+    noh* inter = umaFila.primeiro;
+    
+    while (inter != NULL) {
+        this->enfileira(inter->dado);
+        inter = inter->prox;
+    }
 }
 
 int main() {
