@@ -78,15 +78,20 @@ Dado Fila::Remover() {
         cerr << "Fila vazia" << endl;
         return -1;
     } else {
-        Noh* removido = mPrimeiro;
+        Noh* inter = mPrimeiro;
+        Dado removido = inter->mDado;
         mPrimeiro = mPrimeiro->mPtProx;
+        delete inter;
         --mTamanho;
-        return removido->mDado;
+        return removido;
     }
 }
 
 Dado Fila::Proximo() const {
-    return mPrimeiro->mDado;
+    if (not Vazia()) {
+        return mPrimeiro->mDado;
+    }
+    return -1;
 }
 
 void Fila::LimparTudo() {
