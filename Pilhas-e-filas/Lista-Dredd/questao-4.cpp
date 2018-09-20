@@ -31,12 +31,11 @@ class Fila {
 
 using namespace std;
 
-Fila::Fila(unsigned cap) { // cap tem valor default
-    mDados = new Dado[mCapacidade];
-    mCapacidade = cap;
-    mPosInicio = -1;
-    mPosFim = -1;
+Fila::Fila(unsigned cap) : mCapacidade(cap) { // cap tem valor default
+    mDados = new Dado[cap];
     mTamanho = 0;
+    mPosInicio = 0;
+    mPosFim = 0;
 }
 
 Fila::~Fila() {
@@ -45,25 +44,35 @@ Fila::~Fila() {
 
 // Remove e retorna o próximo elemento da fila.
 Dado Fila::Desenfileira() {
-    if (mPosInicio == mCapacidade - 1) {
+    if (Vazia()) {
+        cout << "Fila vazia" << endl;
+        return -1;
+    } else if (mPosInicio == mCapacidade - 1) {
         mPosInicio = 0;
+        --mTamanho;
         return mDados[mCapacidade - 1];
+    } else if (mTamanho == 1) {
+        unsigned pos = mPosInicio;
+        mPosInicio = 0;
+        mPosFim = 0;
+        mTamanho = 0;
+        return mDados[pos];
     } else {
-        ++mPosFim;
+        ++mPosInicio;
+        --mTamanho;
+        return mDados[mPosInicio - 1];
     }
-    --mTamanho;
-    return mDados[mPosInicio - 1];
 }
 
 // Insere um valor na fila. Retorna um booleano que informa se a inserção foi realmente realizada.
 bool Fila::Enfileirar(const Dado& valor) {
-    if ((mPosFim + mCapacidade - mPosInicio) == (mCapacidade - 1)) {
+    if (mTamanho == mCapacidade) {
         return false;
     } else if (Vazia()) {
         mDados[0] = valor;
         mPosInicio = 0;
         mPosFim = 0;
-    } else if ((mPosFim) == (mCapacidade - 1)){
+    } else if ((mPosFim + 1) == mCapacidade){
         mDados[0] = valor;
         mPosFim = 0;
     } else {
@@ -76,13 +85,8 @@ bool Fila::Enfileirar(const Dado& valor) {
 
 // Escreve todo o conteúdo do armazenamento (começando da posição zero) da fila na saída de dados.
 void Fila::EscreverConteudo(ostream& saida) const {
-    unsigned i = mPosInicio;
-    while (i != (mPosFim + 1)) {
-        if (i == mCapacidade) {
-            i = 0;
-        }
+    for (unsigned i = 0; i < mCapacidade; i++) {
         saida << mDados[i] << " ";
-        ++i;
     }
     saida << endl;
 }
