@@ -60,11 +60,16 @@ void Deque::Inserir(Comando d) {
         ++mTamanho;
     } else {
         Noh* esquecido = mPrimeiro;
-        mPrimeiro = mPrimeiro->mProximo;
-        mPrimeiro->mProximo->mAnterior = NULL;
-        mUltimo->mProximo = novo;
-        novo->mAnterior = mUltimo;
-        mUltimo = novo;
+        if (mTamanho == 1) {
+            mPrimeiro = novo;
+            mUltimo = novo;
+        } else {
+            mPrimeiro = mPrimeiro->mProximo;
+            mPrimeiro->mAnterior = NULL;
+            mUltimo->mProximo = novo;
+            novo->mAnterior = mUltimo;
+            mUltimo = novo;
+        }
         cout << "esqueci: " << esquecido->mComando << endl;
         delete esquecido;
     }
@@ -76,10 +81,17 @@ void Deque::Remover() {
     } else {
         Noh* removido = mUltimo;
         
-        mUltimo->mAnterior->mProximo = NULL;
-        mUltimo = mUltimo->mAnterior;
-        --mTamanho;
+        if (mTamanho == 1) {
+            mUltimo = NULL;
+            mPrimeiro = NULL;
+        } else {
+            Noh* anterior = mUltimo->mAnterior;
+            
+            mUltimo = anterior;
+            mUltimo->mProximo = NULL;
+        }
         
+        --mTamanho;
         cout << "desfazer: " << removido->mComando << endl;
         delete removido;
     }
