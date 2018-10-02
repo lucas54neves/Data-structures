@@ -71,7 +71,26 @@ tabelaHash::~tabelaHash() {
 
 // Insere um valor v com chave c.
 void tabelaHash::insere(string c, string v) {
-    //  CODIGO A SER DESENVOLVIDO
+    // CODIGO DESENVOLVIDO
+    int h;
+    
+    h = funcaoHash(c, capacidade);
+    
+    if (recupera(c) == "NAO ENCONTRADO!") {
+        if (elementos[h] == NULL) {
+            elementos[h] = new noh(c, v);
+        } else {
+            noh* atual = elementos[h];
+            
+            while (atual->proximo != NULL) {
+                atual = atual->proximo;
+            }
+            
+            noh* novo = new noh(c, v);
+            
+            atual->proximo = novo;
+        }
+    }
 }
 
 // recupera um valor associado a uma dada chave
@@ -98,18 +117,58 @@ string tabelaHash::recupera(string c) {
 
 // altera o valor associado a uma chave
 void tabelaHash::altera(string c, string v) {
-    //  CODIGO A SER DESENVOLVIDO
-
-    // imprime "ERRO NA ALTERACAO!" na saída padrão caso tente alterar
-    // elemento não existente na tabela
+    //  CODIGO DESENVOLVIDO
+    if (recupera(c) == "NAO ENCONTRADO!") {
+        cout << "ERRO NA ALTERACAO!" << endl;
+    } else {
+        int h;
+    
+        h = funcaoHash(c, capacidade);
+        
+        if (elementos[h] != NULL && elementos[h]->chave == c) {
+            elementos[h]->valor = v;
+        } else {
+            noh* atual = elementos[h];
+            
+            while (atual != NULL && atual->chave != c) {
+                atual = atual->proximo;
+            }
+            
+            if (atual != NULL && atual->chave == c) {
+                atual->valor = v;
+            }
+        }
+    }
 }
 
 // retira um valor associado a uma chave
 void tabelaHash::remove(string c) {
-    //  CODIGO A SER DESENVOLVIDO
-
-    // imprime "ERRO NA REMOCAO!" na saída padrão caso tente remover
-    // elemento não existente na tabela
+    //  CODIGO DESENVOLVIDO
+    if (recupera(c) == "NAO ENCONTRADO!") {
+        cout << "ERRO NA REMOCAO!" << endl;
+    } else {
+        int h;
+        
+        h = funcaoHash(c, capacidade);
+        if (elementos[h] != NULL && elementos[h]->chave == c) {
+            noh* removido = elementos[h];
+            elementos[h] = elementos[h]->proximo;
+            delete removido;
+        } else {
+            noh* atual = elementos[h];
+            noh* anterior = NULL;
+            
+            while (atual != NULL && atual->chave != c) {
+                anterior = atual;
+                atual = atual->proximo;
+            }
+            
+            if (atual != NULL && atual->chave == c) {
+                anterior->proximo = atual->proximo;
+                delete atual;
+            }
+        }
+    }
 }
 
 // percorre a tabela hash, escrevendo as listas de itens (para fins de debug)
