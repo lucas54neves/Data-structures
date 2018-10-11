@@ -12,6 +12,8 @@ class HeapSort {
         void Imprimir();
         void Arrumar();
         void Ordenar();
+        bool Vazio();
+        Data RetirarRaiz();
     private:
         Data* mVetDados;
         int mCapacidade;
@@ -108,12 +110,29 @@ void HeapSort::CorrigirSubindo(int i) {
     }
 }
 
-void HeapSort::Ordenar(int n) {
-    for (int i = n; i > 1; --i) 
-    { 
-        swap(mVetDados[0], mVetDados[i]); 
-        DescerParaOrdenar(1, i-1); 
-    } 
+void HeapSort::Ordenar() {
+    Arrumar();
+    while (not Vazio()) {
+        cout << RetirarRaiz() << " ";
+    }
+    cout << endl;
+}
+
+bool HeapSort::Vazio() {
+    return mTamanho == 0;
+}
+
+Data HeapSort::RetirarRaiz() {
+    if (not Vazio()) {
+        Data raiz = mVetDados[0];
+        swap(mVetDados[0], mVetDados[mTamanho-1]);
+        --mTamanho;
+        CorrigirDescendo(0);
+        return raiz;
+    } else {
+        cout << "Heap vazio" << endl;
+        return 0;
+    }
 }
 
 int main() {
@@ -134,7 +153,6 @@ int main() {
     h->Imprimir();
     
     h->Ordenar();
-    h->Imprimir();
     
     return 0;
 }
