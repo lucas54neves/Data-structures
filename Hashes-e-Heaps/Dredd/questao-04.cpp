@@ -73,18 +73,18 @@ void Encadeamento::Buscar(string palavra) {
     Noh* inter = mPtrPrimeiro;
     bool achou = false;
     
-    while (inter != NULL) {
+    while (inter != NULL && achou == false) {
         if (inter->mStringPalavra == palavra) {
             achou = true;
-            cout << "[" << inter->mStringPalavra << "] => " << inter->mStringDefinicao << endl;
-            inter = NULL;
         } else {
             inter = inter->mPtrProximo;
         }
     }
     
-    if (not achou) {
-        cout << "NULL" << endl;
+    if (achou) {
+        cout << "[" << inter->mStringPalavra << "] => " << inter->mStringDefinicao << endl;
+    } else {
+        cout << "[" << palavra << "] => NULL" << endl;
     }
 }
 
