@@ -48,19 +48,45 @@ InfoHash::InfoHash(const std::string& chave, const TValor& valor)
 
 Hash::Hash(unsigned capacidade) // capacidade tem valor default
     : mVetPtDados(new InfoHash*[capacidade]), REMOVIDO(new InfoHash()), mCapacidade(capacidade), mTamanho(0) {
-    // FALTA FAZER:
-    // inicializar todas as posições de armazenamento com NULL indicando posição VAZIA
+    // Implementado por Lucas Neves
+    // inicializa todas as posições de armazenamento com NULL indicando posição VAZIA
+    for (unsigned i = 0; i < mCapacidade; ++i) {
+        mVetPtDados[i] = NULL;
+    }
 }
 
 Hash::~Hash() {
-    // FALTA FAZER:
+    // Implementado por Lucas Neves
     // desalocar memória de cada item (InfoHash) armazenado
+        for (unsigned i = 0; i < mCapacidade; ++i) {
+            delete mVetPtDados[i];
+        }
     // desalocar o ponteiro especial REMOVIDO
     // desalocar o vetor de ponteiros
 }
 
 unsigned Hash::Buscar(const std::string& chave) const {
+    // Implementado por Lucas Neves
     // Retorna a posicao em que uma chave está armazenada na estrutura. Protegido.
+    unsigned pos = Posicao(chave);
+    
+    if (mVetPtDados[pos] == NULL || mVetPtDados[pos] == REMOVIDO) {
+        return pos;
+    } else {
+        unsigned i = pos + 1;
+        while (i != pos) {
+            if (i >= mCapacidade) {
+                i = 0;
+            }
+            
+            if (mVetPtDados[i]->mChave == chave) {
+                return i;
+            } else {
+                ++i;
+            }
+        }
+    }
+    return 0;
 }
 
 void Hash::EscreverEstrutura(std::ostream& saida) const {
@@ -78,7 +104,33 @@ void Hash::EscreverEstrutura(std::ostream& saida) const {
 }
 
 void Hash::Inserir(const string& chave, const TValor& valor) {
+    // Implementado por Lucas Neves
     // Insere uma cópia do valor. Não permite inserção de chave repetida.
+    if (mTamanho < mCapacidade) {
+        unsigned pos = Posicao(chave);
+        
+        if (mVetPtDados[pos] == NULL || mVetPtDados[pos] == REMOVIDO) {
+            mVetPtDados[pos] = new InfoHash(chave, valor);
+        } else {
+            bool inserido = false;
+            unsigned i = pos + 1;
+            while (not inserido) {
+                if (i >= mCapacidade) {
+                    i = 0;
+                }
+                if (mVetPtDados[i] == NULL || mVetPtDados[i] == REMOVIDO) {
+                    mVetPtDados[i] = new InfoHash(chave, valor);
+                    inserido = true;
+                }
+                
+                ++i;
+            }
+        }
+        
+        ++mTamanho;
+    } else {
+        cerr << "ERRO" << endl;
+    }
 }
 
 unsigned Hash::Posicao(const string& chave) const {
@@ -91,11 +143,49 @@ unsigned Hash::Posicao(const string& chave) const {
 }
 
 void Hash::Remover(const std::string& chave) {
+    // Implementado por Lucas Neves
     // Remove um item da hash associado com a chave dada.
+    unsigned pos = Posicao(chave);
+    bool removido = false;
+    
+    if (mVetPtDados[pos] != NULL && mVetPtDados[pos] != REMOVIDO) {
+        if (mVetPtDados[pos]->mChave == chave) {
+            mVetPtDados[pos] = REMOVIDO;
+            --mTamanho;
+            removido = true;
+        } else {
+            for (unsigned i = pos + 1; i != pos && mVetPtDados[i]->mChave != chave; ++i) {
+                if (mVetPtDados[i]->mChave == chave) {
+                    mVetPtDados[i] = REMOVIDO;
+                    --mTamanho;
+                    removido = true;
+                }
+            }
+        }
+    }
+    
+    if (not removido) {
+        cerr << "ERRO" << endl;
+    }
 }
 
 TValor Hash::Valor(const std::string& chave) const {
     // Retorna o valor associado a uma chave.
+    unsigned pos = Posicao(chave);
+    
+    if (mVetPtDados[pos]->mChave == chave) {
+        return mVetPtDados[pos]->mValor;
+    } else {
+        for (unsigned i = pos + 1; i != pos; ++i) {
+            if (i >= mCapacidade) {
+                i = 0;
+            }
+            if (mVetPtDados[i]->mChave == chave) {
+                return mVetPtDados[i]->mValor;
+            }
+        }
+    }
+    return 0;
 }
 
 int main() {
