@@ -53,10 +53,10 @@ Noh::~Noh() {
 
 bool Noh::FilhoDaDireita() {
     // implementar
-    if (this == this->pai->dir) {
-        return true;
-    } else {
+    if (this->pai == NULL) {
         return false;
+    } else {
+        return this == pai->dir;
     }
 }
 
@@ -65,18 +65,22 @@ Dado Noh::MenorRecursivo() {
     if (esq != NULL) {
         return esq->MenorRecursivo();
     } else {
-        return this->valor;
+        return valor;
     }
 }
 
 bool Noh::Sucessor(Dado* ptResultado) {
     // implementar
-    if (dir != NULL) {
-        *ptResultado = MenorRecursivo();
+    if (pai == NULL) {
+        if (dir == NULL) {
+            return false;
+        } else {
+           *ptResultado = dir->MenorRecursivo();
+            return true; 
+        }
+    } else if (dir != NULL) {
+        *ptResultado = dir->MenorRecursivo();
         return true;
-    } else if (not FilhoDaDireita()) {
-            *ptResultado = pai->valor;
-            return true;
     } else if (FilhoDaDireita()) {
         Noh* atual = this;
         
@@ -91,6 +95,9 @@ bool Noh::Sucessor(Dado* ptResultado) {
         } else {
             return false;
         }
+    } else {
+        *ptResultado = pai->valor;
+        return true;
     }
 }
 
