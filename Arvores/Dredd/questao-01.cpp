@@ -4,13 +4,15 @@ using namespace std;
 
 enum posicao {esq, dir};
 
+typedef int Tipo;
+
 class Noh {
     friend class Arvore;
     public:
         Noh(int chave = 0);
         ~Noh();
     private:
-        int mChave;
+        Tipo mChave;
         Noh* mEsquerdo;
         Noh* mDireito;
         Noh* mPai;
@@ -32,9 +34,9 @@ class Arvore {
     public:
         Arvore();
         ~Arvore();
-        void Inserir(int chave);
-        Noh* Buscar(int chave);
-        void Remover(int chave);
+        void Inserir(Tipo chave);
+        Noh* Buscar(Tipo chave);
+        void Remover(Tipo chave);
         void EscreverOrdem();
         void EscreverPreOrdem();
         bool Vazia();
@@ -54,7 +56,7 @@ Arvore::~Arvore() {
     delete mRaiz;
 }
 
-void Arvore::Inserir(int chave) {
+void Arvore::Inserir(Tipo chave) {
     Noh* novo = new Noh(chave);
     posicao posInsercao;
     
@@ -86,14 +88,14 @@ void Arvore::Inserir(int chave) {
     }
 }
 
-Noh* Arvore::Buscar (int chave) {
+Noh* Arvore::Buscar (Tipo chave) {
     Noh* atual = mRaiz;
     
     while (atual != NULL) {
         if (atual->mChave == chave) {
             return atual;
         } else {
-            if (atual->mChave < chave) {
+            if (atual->mChave > chave) {
                 atual = atual->mEsquerdo;
             } else {
                 atual = atual->mDireito;
@@ -104,30 +106,32 @@ Noh* Arvore::Buscar (int chave) {
     return atual;
 }
 
-void Arvore::Remover (int chave) {
+void Arvore::Remover (Tipo chave) {
     Noh* nohRemover = Buscar(chave);
     
-    if (nohRemover->mEsquerdo == NULL) {
-        Transplanta(nohRemover, nohRemover->mDireito);
-    } else if (nohRemover->mDireito == NULL) {
-        Transplanta(nohRemover, nohRemover->mEsquerdo);
-    } else {
-        Noh* sucessor = Minimo(nohRemover->mDireito);
-        
-        if (sucessor->mPai != nohRemover) {
-            Transplanta(sucessor, sucessor->mDireito);
-            sucessor->mDireito = nohRemover->mDireito;
-            sucessor->mDireito->mPai = sucessor;
-        }
-        
-        Transplanta(nohRemover, sucessor);
-        sucessor->mDireito = nohRemover->mDireito;
-        sucessor->mDireito->mPai = sucessor;
-    }
-    
-    nohRemover->mEsquerdo = NULL;
-    nohRemover->mDireito = NULL;
-    delete nohRemover;
+    if (nohRemover != NULL) {
+		if (nohRemover->mEsquerdo == NULL) {
+			Transplanta(nohRemover, nohRemover->mDireito);
+		} else if (nohRemover->mDireito == NULL) {
+			Transplanta(nohRemover, nohRemover->mEsquerdo);
+		} else {
+			Noh* sucessor = Minimo(nohRemover->mDireito);
+			
+			if (sucessor->mPai != nohRemover) {
+				Transplanta(sucessor, sucessor->mDireito);
+				sucessor->mDireito = nohRemover->mDireito;
+				sucessor->mDireito->mPai = sucessor;
+			}
+			
+			Transplanta(nohRemover, sucessor);
+			sucessor->mEsquerdo = nohRemover->mEsquerdo;
+			sucessor->mEsquerdo->mPai = sucessor;
+		}
+		
+		nohRemover->mEsquerdo = NULL;
+		nohRemover->mDireito = NULL;
+		delete nohRemover;
+	}
 }
 
 void Arvore::EscreverOrdemAux(Noh* atual, int nivel) {
@@ -185,7 +189,7 @@ Noh* Arvore::Minimo(Noh* raiz) {
 int main() {
     Arvore abb;
     char operacao;
-    int chave;
+    Tipo chave;
     
     do {
         cin >> operacao;
@@ -209,5 +213,5 @@ int main() {
                 abb.EscreverPreOrdem();
                 break;
         }
-    } while (operacao != 'f');
+    } while (operacao != 'q');
 }
