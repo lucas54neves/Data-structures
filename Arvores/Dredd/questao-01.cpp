@@ -213,5 +213,5 @@ int main() {
                 abb.EscreverPreOrdem();
                 break;
         }
-    } while (operacao != 'q');
+    } while (operacao != 'f');
 }
