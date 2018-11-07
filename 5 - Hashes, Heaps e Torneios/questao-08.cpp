@@ -119,9 +119,11 @@ int Torneio::Direito(int i) {
 }
 
 TChave Torneio::Raiz() {
-    if (mTamanho == mNroTorneios)
+    if (mTamanho == mNroTorneios) {
         throw runtime_error("Impossível acessar raiz de torneio vazio.");
-    // completar aqui
+    } else { // Implementado por Lucas Neves
+        return mVetChaves[0];
+    }
 }
 
 TChave Torneio::Retirar() {
