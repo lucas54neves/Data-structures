@@ -58,11 +58,15 @@ Hash::Hash(unsigned capacidade) // capacidade tem valor default
 Hash::~Hash() {
     // Implementado por Lucas Neves
     // desalocar memória de cada item (InfoHash) armazenado
-        for (unsigned i = 0; i < mCapacidade; ++i) {
+    for (unsigned i = 0; i < mCapacidade; ++i) {
+        if(mVetPtDados[i] != REMOVIDO) {
             delete mVetPtDados[i];
         }
+    }
     // desalocar o ponteiro especial REMOVIDO
+    delete REMOVIDO;
     // desalocar o vetor de ponteiros
+    delete[] mVetPtDados;
 }
 
 unsigned Hash::Buscar(const std::string& chave) const {
@@ -71,7 +75,7 @@ unsigned Hash::Buscar(const std::string& chave) const {
     unsigned pos = Posicao(chave);
     
     if (mVetPtDados[pos] == NULL || mVetPtDados[pos] == REMOVIDO) {
-        return pos;
+        return 0;
     } else {
         unsigned i = pos + 1;
         while (i != pos) {
@@ -111,6 +115,8 @@ void Hash::Inserir(const string& chave, const TValor& valor) {
         
         if (mVetPtDados[pos] == NULL || mVetPtDados[pos] == REMOVIDO) {
             mVetPtDados[pos] = new InfoHash(chave, valor);
+        } else if (mVetPtDados[pos]->mChave == chave) {
+            cerr << "ERRO" << endl;
         } else {
             bool inserido = false;
             unsigned i = pos + 1;
@@ -118,7 +124,10 @@ void Hash::Inserir(const string& chave, const TValor& valor) {
                 if (i >= mCapacidade) {
                     i = 0;
                 }
-                if (mVetPtDados[i] == NULL || mVetPtDados[i] == REMOVIDO) {
+                
+                if (mVetPtDados[pos]->mChave == chave) {
+                    cerr << "ERRO" << endl;
+                } else if (mVetPtDados[i] == NULL || mVetPtDados[i] == REMOVIDO) {
                     mVetPtDados[i] = new InfoHash(chave, valor);
                     inserido = true;
                 }
@@ -145,27 +154,36 @@ unsigned Hash::Posicao(const string& chave) const {
 void Hash::Remover(const std::string& chave) {
     // Implementado por Lucas Neves
     // Remove um item da hash associado com a chave dada.
-    unsigned pos = Posicao(chave);
-    bool removido = false;
-    
-    if (mVetPtDados[pos] != NULL && mVetPtDados[pos] != REMOVIDO) {
-        if (mVetPtDados[pos]->mChave == chave) {
-            mVetPtDados[pos] = REMOVIDO;
-            --mTamanho;
-            removido = true;
+    if (mTamanho == 0) {
+        cerr << "ERRO" << endl;
+    } else {
+        unsigned pos = Posicao(chave);
+        
+        if (mVetPtDados[pos] == NULL) {
+            cerr << "ERRO" << endl;
         } else {
-            for (unsigned i = pos + 1; i != pos && mVetPtDados[i]->mChave != chave; ++i) {
-                if (mVetPtDados[i]->mChave == chave) {
-                    mVetPtDados[i] = REMOVIDO;
+            bool removido = false;
+            
+            if (mVetPtDados[pos] != REMOVIDO) {
+                if (mVetPtDados[pos]->mChave == chave) {
+                    mVetPtDados[pos] = REMOVIDO;
                     --mTamanho;
                     removido = true;
+                } else {
+                    for (unsigned i = pos + 1; i != pos && removido == false; ++i) {
+                        if (mVetPtDados[i]->mChave == chave) {
+                            mVetPtDados[i] = REMOVIDO;
+                            --mTamanho;
+                            removido = true;
+                        }
+                    }
                 }
             }
+            
+            if (not removido) {
+                cerr << "ERRO" << endl;
+            }
         }
-    }
-    
-    if (not removido) {
-        cerr << "ERRO" << endl;
     }
 }
 
