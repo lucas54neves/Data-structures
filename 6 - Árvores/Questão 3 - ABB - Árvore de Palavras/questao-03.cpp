@@ -2,138 +2,129 @@
 #include <fstream>
 
 using namespace std;
-
-enum PosicaoInsercao {esquerda, direita};
-
-class Posicao {
-    friend class ListaPos;
-    public:
-        Posicao(int pos) {
-            mPosicao = pos;
-            mProxima = NULL;
-        };
-    private:
-        int mPosicao;
-        Posicao* mProxima;
-};
-
-class ListaPos {
-    public:
-        ListaPos() {
-            mPrimeira = NULL;
-            mUltima = NULL;
-        };
-        void Inserir(int pos) {
-            Posicao* novo = new Posicao(pos);
-            if (mPrimeira == NULL) {
-                mPrimeira = novo;
-                mUltima = novo;
-            } else {
-                mUltima->mProxima = novo;
-                mUltima = novo;
-            }
-        };
-        void Imprimir() {
-            Posicao* inter = mPrimeira;
-            
-            while (inter != NULL) {
-                cout << inter->mPosicao;
-                if (inter != mUltima) {
-                    cout << " ";
-                } else {
-                    cout << endl;
-                }
-                
-                inter = inter->mProxima;
-            }
-        };
-    private:
-        Posicao* mPrimeira;
-        Posicao* mUltima;
-};
+typedef string Dado;
+enum Posicao {dir, esq};
 
 class Noh {
-    friend class Arvore;
-    public:
-        Noh(string nome) {
-            mNome = nome;
-            mEsquerdo = NULL;
-            mDireito = NULL;
-        };
+    friend class ABB;
     private:
-        string mNome;
-        Noh* mEsquerdo;
-        Noh* mDireito;
-        Noh* mPai;
-        ListaPos mPosicoes;
+        Dado mValor;
+        int mPosicao;
+        Noh* mPtPai;
+        Noh* mPtEsquerdo;
+        Noh* mPtDireito;
+        Noh* mPtProximo;
+    public:
+        Noh(Dado d = 0, int pos = 0)
+        : mValor(d), mPosicao(pos), mPtPai(NULL), mPtEsquerdo(NULL), mPtDireito(NULL), mPtProximo(NULL){
+        }
+        ~Noh() {
+            delete mPtEsquerdo;
+            delete mPtDireito;
+        }
 };
 
-class Arvore {
+class ABB {
+    private:
+        Noh* mPtRaiz;
     public:
-        Arvore() {
-            mRaiz = NULL;
-        };
-        ~Arvore() {
-            delete mRaiz;
-        };
-        void Inserir(string nome, int pos) {
-            Noh* novo = new Noh(nome);
-            PosicaoInsercao posInsercao;
+        ABB()
+        : mPtRaiz(NULL) {
+        }
+        
+        ~ABB() {
+            delete mPtRaiz;
+        }
+        
+        void Inserir(Dado d, int pos) {
+            Noh* novo = new Noh(d, pos);
             
-            if (mRaiz == NULL) {
-                mRaiz = novo;
+            if (mPtRaiz == NULL) {
+                mPtRaiz = novo;
             } else {
-                Noh* atual = mRaiz;
-                Noh* pai = NULL;
+                Posicao posInsercao;
+                Noh* atual = mPtRaiz;
+                Noh* anterior = NULL;
+                bool achou = false;
                 
-                while (atual != NULL) {
-                    pai = atual;
+                while (atual != NULL && achou == false) {
+                    anterior = atual;
                     
-                    if (atual->mNome > nome) {
-                        atual = atual->mEsquerdo;
-                        posInsercao = esquerda;
+                    if (atual->mValor > d && atual->mValor != d) {
+                        atual = atual->mPtEsquerdo;
+                        posInsercao = esq;
+                    } else if (atual->mValor < d && atual->mValor != d) {
+                        atual = atual->mPtDireito;
+                        posInsercao = dir;
                     } else {
-                        atual = atual->mDireito;
-                        posInsercao = direita;
+                        achou = true;
+                        
+                        while (atual->mPtProximo != NULL) {
+                            atual = atual->mPtProximo;
+                        }
+                        
+                        atual->mPtProximo = novo;
                     }
                 }
                 
-                novo->mPai = pai;
-                
-                if (posInsercao == esquerda) {
-                    pai->mEsquerdo = novo;
-                } else {
-                    pai->mDireito = novo;
+                if (achou == false) {
+                    novo->mPtPai = anterior;
+                    
+                    if (posInsercao == esq) {
+                        anterior->mPtEsquerdo = novo;
+                    } else {
+                        anterior->mPtDireito = novo;
+                    }
                 }
             }
-        };
-        bool Buscar(string nome) {
-            Noh* atual = mRaiz;
+        }
+        
+        void Buscar(Dado d) {
+            Noh* atual = mPtRaiz;
+            bool achou = false;
             
-            while (atual != NULL) {
-                if (atual->mNome == nome) {
-                    atual->mPosicoes->Imprimir;
-                    return true;
-                } else if (atual->mNome > nome) {
-                    atual = atual->mEsquerdo;
+            while (atual != NULL && achou == false) {
+                if (atual->mValor == d) {
+                    achou = true;
+                    
+                    while (atual != NULL) {
+                        cout << atual->mPosicao << " ";
+                        atual = atual->mPtProximo;
+                    }
+                } else if (atual->mValor > d) {
+                    atual = atual->mPtEsquerdo;
                 } else {
-                    atual = atual->mDireito;
+                    atual = atual->mPtDireito;
                 }
             }
             
-            cout << "-1" << endl;
-            return false;
-        };
-    private:
-        Noh* mRaiz;
+            if (achou == false) {
+                cout << "-1" << endl;
+            }
+        }
 };
 
 int main() {
-    ifstream arquivo("entrada.txt");
-            
-            if (arquivo) {
-                while (arquivo.eof()) {
-                    
-                }
-            };
+    ABB arvorePalavras;
+    int pos = 1;
+    
+    ifstream arquivo;
+    arquivo.open("entrada.txt");
+    
+    if (arquivo) {
+        Dado d;
+        
+        while (!arquivo.eof()) {
+            arquivo >> d;
+            arvorePalavras.Inserir(d, pos);
+            ++pos;
+        }
+    }
+    
+    Dado palavra;
+    cin >> palavra;
+    
+    arvorePalavras.Buscar(palavra);
+    
+    return 0;
 }
