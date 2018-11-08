@@ -85,11 +85,15 @@ void Arvore::EscreverNivelANivel(ostream& saida) {
 }
 
 Arvore* Arvore::Menor() {
+    return mPtEsq;
 }
 
 void Arvore::SubstituirPor(Arvore* ptArv) {
-    if (ptArv == NULL)
+    if (ptArv == NULL) {
         throw invalid_argument("Substitutição de nós falhou.");
+    } else {
+        
+    }
     // complete aqui
 }
 
