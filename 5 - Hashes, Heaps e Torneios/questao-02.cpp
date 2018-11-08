@@ -74,13 +74,16 @@ unsigned Hash::Buscar(const std::string& chave) const {
     // Retorna a posicao em que uma chave está armazenada na estrutura. Protegido.
     unsigned pos = Posicao(chave);
     
-    if (mVetPtDados[pos] == NULL || mVetPtDados[pos] == REMOVIDO) {
-        return 0;
+    if (mVetPtDados[pos] == NULL) {
+        throw runtime_error ("Chave não encontrada.");
     } else {
         unsigned i = pos + 1;
-        while (i != pos) {
+        bool virou = false;
+        
+        while (i != pos || virou == false) {
             if (i >= mCapacidade) {
                 i = 0;
+                virou = true;
             }
             
             if (mVetPtDados[i]->mChave == chave) {
@@ -90,7 +93,7 @@ unsigned Hash::Buscar(const std::string& chave) const {
             }
         }
     }
-    return 0;
+    throw runtime_error ("Chave não encontrada.");
 }
 
 void Hash::EscreverEstrutura(std::ostream& saida) const {
@@ -116,7 +119,7 @@ void Hash::Inserir(const string& chave, const TValor& valor) {
         if (mVetPtDados[pos] == NULL || mVetPtDados[pos] == REMOVIDO) {
             mVetPtDados[pos] = new InfoHash(chave, valor);
         } else if (mVetPtDados[pos]->mChave == chave) {
-            cerr << "ERRO" << endl;
+            throw runtime_error ("Chave duplicada");
         } else {
             bool inserido = false;
             unsigned i = pos + 1;
@@ -126,7 +129,7 @@ void Hash::Inserir(const string& chave, const TValor& valor) {
                 }
                 
                 if (mVetPtDados[pos]->mChave == chave) {
-                    cerr << "ERRO" << endl;
+                    throw runtime_error ("Chave duplicada");
                 } else if (mVetPtDados[i] == NULL || mVetPtDados[i] == REMOVIDO) {
                     mVetPtDados[i] = new InfoHash(chave, valor);
                     inserido = true;
@@ -138,7 +141,7 @@ void Hash::Inserir(const string& chave, const TValor& valor) {
         
         ++mTamanho;
     } else {
-        cerr << "ERRO" << endl;
+        throw runtime_error ("Inserção inválida");
     }
 }
 
@@ -155,33 +158,31 @@ void Hash::Remover(const std::string& chave) {
     // Implementado por Lucas Neves
     // Remove um item da hash associado com a chave dada.
     if (mTamanho == 0) {
-        cerr << "ERRO" << endl;
+        throw runtime_error ("Hash vazia.");
     } else {
-        unsigned pos = Posicao(chave);
+        unsigned h = Posicao(chave);
         
-        if (mVetPtDados[pos] == NULL) {
-            cerr << "ERRO" << endl;
+        if (mVetPtDados[h] == NULL) {
+            throw runtime_error ("Posição vazia.");
+        } else if (mVetPtDados[h]->mChave == chave) {
+            mVetPtDados[h] = REMOVIDO;
+            --mTamanho;
         } else {
             bool removido = false;
             
-            if (mVetPtDados[pos] != REMOVIDO) {
-                if (mVetPtDados[pos]->mChave == chave) {
-                    mVetPtDados[pos] = REMOVIDO;
+            for (unsigned i = h + 1; i != h && removido == false; ++i) {
+                if (i >= mCapacidade) {
+                    i = 0;
+                }
+                if (mVetPtDados[i]->mChave == chave) {
+                    mVetPtDados[i] = REMOVIDO;
                     --mTamanho;
                     removido = true;
-                } else {
-                    for (unsigned i = pos + 1; i != pos && removido == false; ++i) {
-                        if (mVetPtDados[i]->mChave == chave) {
-                            mVetPtDados[i] = REMOVIDO;
-                            --mTamanho;
-                            removido = true;
-                        }
-                    }
                 }
             }
             
-            if (not removido) {
-                cerr << "ERRO" << endl;
+            if (removido == false) {
+                throw runtime_error ("Chave não encontrada");
             }
         }
     }
