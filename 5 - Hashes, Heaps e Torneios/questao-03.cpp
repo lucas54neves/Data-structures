@@ -52,21 +52,53 @@ InfoHash::InfoHash(const std::string& chave, const TValor& valor)
 
 Hash::Hash(unsigned capacidade) // capacidade tem valor default
     : mVetPtDados(new InfoHash*[capacidade]), REMOVIDO(new InfoHash()), mCapacidade(capacidade), mTamanho(0) {
-    // FALTA FAZER:
+    // Implementado por Lucas Neves
     // inicializar todas as posições de armazenamento com NULL indicando posição VAZIA
-    #warning Construtor não implementado
+    for (unsigned i = 0; i < mCapacidade; ++i) {
+        mVetPtDados[i] = NULL;
+    }
 }
 
 Hash::~Hash() {
-    // FALTA FAZER:
+    // Implementado por Lucas Neves
     // desalocar memória de cada item (InfoHash) armazenado
+    for (unsigned i = 0; i < mCapacidade; ++i) {
+        if (mVetPtDados[i] != REMOVIDO) {
+            delete mVetPtDados[i];
+        }
+    }
     // desalocar o ponteiro especial REMOVIDO
+    delete REMOVIDO;
     // desalocar o vetor de ponteiros
-    #warning Destrutor não implementado
+    delete[] mVetPtDados;
 }
 
 unsigned Hash::Buscar(const std::string& chave) const {
+    // Implementado por Lucas Neves
     // Retorna a posicao em que uma chave está armazenada na estrutura. Protegido.
+    unsigned h = Posicao(chave);
+    
+    if (mVetPtDados[h]->mChave == chave) {
+        return h;
+    } else {
+        unsigned i = h + 1;
+        bool inverteu = false;
+        
+        while (i != h || inverteu == false) {
+            if (i == mCapacidade) {
+                i = 0;
+                inverteu = true;
+            }
+            
+            if (mVetPtDados[i]->mChave == chave) {
+                return i;
+            } else {
+                ++i;
+            }
+        }
+        
+        throw runtime_error ("Chave não encontrada.");
+    }
 }
 
 void Hash::EscreverEstrutura(std::ostream& saida) const {
@@ -84,14 +116,64 @@ void Hash::EscreverEstrutura(std::ostream& saida) const {
 }
 
 void Hash::Inserir(const string& chave, const TValor& valor) {
+    // Implementado por Lucas Neves
     // Insere uma cópia do valor. Não permite inserção de chave repetida.
+    if (mTamanho == mCapacidade) {
+        Redimensionar(mCapacidade + 5);
+    }
+    
+    if (mTamanho < mCapacidade) {
+        unsigned pos = Posicao(chave);
+        
+        if (mVetPtDados[pos] == NULL || mVetPtDados[pos] == REMOVIDO) {
+            mVetPtDados[pos] = new InfoHash(chave, valor);
+        } else if (mVetPtDados[pos]->mChave == chave) {
+            throw runtime_error ("Chave duplicada");
+        } else {
+            bool inserido = false;
+            unsigned i = pos + 1;
+            while (not inserido) {
+                if (i >= mCapacidade) {
+                    i = 0;
+                }
+                
+                if (mVetPtDados[pos]->mChave == chave) {
+                    throw runtime_error ("Chave duplicada");
+                } else if (mVetPtDados[i] == NULL || mVetPtDados[i] == REMOVIDO) {
+                    mVetPtDados[i] = new InfoHash(chave, valor);
+                    inserido = true;
+                }
+                
+                ++i;
+            }
+        }
+        
+        ++mTamanho;
+    } else {
+        throw runtime_error ("Inserção inválida");
+    }
 }
 
 void Hash::Inserir(InfoHash* ptPar) {
+    // Implementado por Lucas Neves
     // Insere um par (chave/valor) na estrutura. Supõe que a chave é válida e única.
     // Supõe que há espaço para inserção e que o ponteiro é válido. Não altera o tamanho.
     // Método protegido, auxiliar para Inserir(chave, valor) e Redimensionar(cap).
-    #warning Inserir(InfoHash*) não implementado
+    unsigned h = Posicao(ptPar->mChave);
+    
+    if (mVetPtDados[h] == NULL) {
+        mVetPtDados[h] = ptPar;
+    } else {
+        unsigned i = h;
+        while (mVetPtDados[i] != NULL || mVetPtDados[i] != NULL) {
+            if (i >= mCapacidade) {
+                i = 0;
+            } else {
+                ++i;
+            }
+        }
+        mVetPtDados[i] = ptPar;
+    }
 }
 
 unsigned Hash::Posicao(const string& chave) const {
@@ -104,18 +186,81 @@ unsigned Hash::Posicao(const string& chave) const {
 }
 
 void Hash::Redimensionar(unsigned novaCapacidade) {
+    // Implementado por Lucas Neves
     // Altera a capacidade da estrutura. Pode ser chamado mesmo que a estrutura não esteja cheia.
     // Verifica se a novaCapacidade é válida. Método protegido.
-    #warning Redimensionamento não implementado
+    if (novaCapacidade > mCapacidade) {
+        Hash* novaHash = new Hash(novaCapacidade);
+        
+        for (unsigned i = 0; i < mCapacidade; ++i) {
+            novaHash->Inserir(mVetPtDados[i]);
+        }
+        
+        mCapacidade = novaCapacidade;
+        mVetPtDados = novaHash->mVetPtDados;
+    } else {
+        throw runtime_error ("A nova capacidade é menor que a capacidade anterior");
+    }
 }
 
 void Hash::Remover(const std::string& chave) {
+    // Implementado por Lucas Neves
     // Remove um item da hash associado com a chave dada.
-    #warning Remoção não implementada
+    if (mTamanho == 0) {
+        throw runtime_error ("Hash vazia");
+    } else {
+        unsigned h = Posicao(chave);
+        
+        if (mVetPtDados[h] == NULL) {
+            throw runtime_error ("Posição vazia");
+        } else if (mVetPtDados[h]->mChave == chave) {
+            mVetPtDados[h] = REMOVIDO;
+            --mTamanho;
+        } else {
+            bool removido = false;
+            unsigned i = h + 1;
+            
+            while (i != h && removido == false) {
+                if (i >= mCapacidade) {
+                    i = 0;
+                }
+                
+                if (mVetPtDados[i]->mChave == chave) {
+                    mVetPtDados[i] = REMOVIDO;
+                    --mTamanho;
+                    removido = true;
+                }
+                
+                ++i;
+            }
+            
+            if (removido == false) {
+                throw runtime_error ("Remoção inválida");
+            }
+        }
+    }
 }
 
 TValor Hash::Valor(const std::string& chave) const {
+    // Implementado por Lucas Neves
     // Retorna o valor associado a uma chave.
+    unsigned h = Posicao(chave);
+    
+    if (mVetPtDados[h]->mChave == chave) {
+        return mVetPtDados[h]->mValor;
+    } else {
+        for (unsigned i = h + 1; i != h; ++i) {
+            if (i >= mCapacidade) {
+                i = 0;
+            }
+            
+            if (mVetPtDados[i]->mChave == chave) {
+                return mVetPtDados[h]->mValor;
+            }
+        }
+    }
+    
+    throw runtime_error ("Chave não encontrada");
 }
 
 int main() {
