@@ -79,13 +79,13 @@ unsigned Hash::Buscar(const std::string& chave) const {
     unsigned h = Posicao(chave);
     
     if (mVetPtDados[h]->mChave == chave) {
-        return h;
+        throw runtime_error ("Chave não encontrada.");
     } else {
         unsigned i = h + 1;
         bool inverteu = false;
         
         while (i != h || inverteu == false) {
-            if (i == mCapacidade) {
+            if (i >= mCapacidade) {
                 i = 0;
                 inverteu = true;
             }
@@ -96,9 +96,8 @@ unsigned Hash::Buscar(const std::string& chave) const {
                 ++i;
             }
         }
-        
-        throw runtime_error ("Chave não encontrada.");
     }
+    throw runtime_error ("Chave não encontrada.");
 }
 
 void Hash::EscreverEstrutura(std::ostream& saida) const {
@@ -196,6 +195,8 @@ void Hash::Redimensionar(unsigned novaCapacidade) {
             novaHash->Inserir(mVetPtDados[i]);
         }
         
+        delete[] mVetPtDados;
+        
         mCapacidade = novaCapacidade;
         mVetPtDados = novaHash->mVetPtDados;
     } else {
@@ -217,25 +218,21 @@ void Hash::Remover(const std::string& chave) {
             mVetPtDados[h] = REMOVIDO;
             --mTamanho;
         } else {
-            bool removido = false;
-            unsigned i = h + 1;
+           bool removido = false;
             
-            while (i != h && removido == false) {
+            for (unsigned i = h + 1; i != h && removido == false; ++i) {
                 if (i >= mCapacidade) {
                     i = 0;
                 }
-                
                 if (mVetPtDados[i]->mChave == chave) {
                     mVetPtDados[i] = REMOVIDO;
                     --mTamanho;
                     removido = true;
                 }
-                
-                ++i;
             }
             
             if (removido == false) {
-                throw runtime_error ("Remoção inválida");
+                throw runtime_error ("Chave não encontrada");
             }
         }
     }
