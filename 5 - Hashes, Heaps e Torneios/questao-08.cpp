@@ -1,7 +1,6 @@
 #include <iostream>
 #include <exception>
 #include <limits>
-#include <utility>
 
 typedef int TChave;
 
@@ -14,31 +13,31 @@ class Torneio {
         Torneio(TChave vet[], int tam);
         ~Torneio();
         void Inserir(TChave chave);
-        // Retorna o vencedor do torneio (maior) sem removê-lo.
+        // Retorna o vencedor do torneio (maior) sem removÃª-lo.
         TChave Raiz();
         TChave Retirar();
         bool Vazio();
     protected:
-        // Atualiza uma posição, com base em seus dois filhos.
+        // Atualiza uma posiÃ§Ã£o, com base em seus dois filhos.
         void Atualizar(int i);
-        // Atualiza um toneiro subindo a partir da posicao dada. Util para inserção.
+        // Atualiza um toneiro subindo a partir da posicao dada. Util para inserÃ§Ã£o.
         void ArrumarSubindo(int i);
-        // Atualiza todos os nós intermediários do torneio.
+        // Atualiza todos os nÃ³s intermediÃ¡rios do torneio.
         void ArrumarTudo();
-        // Calcula o espaço necessário e inicializa atributos. Usado nos contrutores.
+        // Calcula o espaÃ§o necessÃ¡rio e inicializa atributos. Usado nos contrutores.
         void CalcularEspacoDeArmazenamento(int tam);
-        // Calcula a posição do filho direito de um nó.
+        // Calcula a posiÃ§Ã£o do filho direito de um nÃ³.
         inline int Direito(int i);
-        // Calcula a posição do filho esquerdo de um nó.
+        // Calcula a posiÃ§Ã£o do filho esquerdo de um nÃ³.
         inline int Esquerdo(int i);
-        // Calcula a posição do pai de um nó.
+        // Calcula a posiÃ§Ã£o do pai de um nÃ³.
         inline int Pai(int i);
 
-        TChave* mVetChaves; // espaço de armazenamento
-        int mCapacidade; // quantidade máxima de nós
-        int mTamanho; // quantidade de nós utilizados
-        int mNroTorneios; // quantidade de nós intermediários
-        TChave mMenor; // valor especial que indica ausência de valor
+        TChave* mVetChaves; // espaÃ§o de armazenamento
+        int mCapacidade; // quantidade mÃ¡xima de nÃ³s
+        int mTamanho; // quantidade de nÃ³s utilizados
+        int mNroTorneios; // quantidade de nÃ³s intermediÃ¡rios
+        TChave mMenor; // valor especial que indica ausÃªncia de valor
 };
 
 using namespace std;
@@ -60,7 +59,7 @@ Torneio::Torneio(TChave vet[], int tam) {
     for (; i < tam; ++i) {
         mVetChaves[mNroTorneios+i] = vet[i];
     }
-    // posicoes extras ganham a menor chave para completar nós intermediarios
+    // posicoes extras ganham a menor chave para completar nÃ³s intermediarios
     i += mNroTorneios;
     while (i < mCapacidade)
         mVetChaves[i++] = mMenor;
@@ -71,30 +70,25 @@ Torneio::~Torneio() {
     delete[] mVetChaves;
 }
 
-void Torneio::Atualizar(int i) {
-    // Implementado por Lucas Neves
-    TChave esq = Esquerdo(i);
-    TChave dir = Direito(i);
-    
-    if (mVetChaves[esq] > mVetChaves[dir]) {
-        mVetChaves[i] = mVetChaves[esq];
+void Torneio::Atualizar(int i) { // Implementado por Lucas Neves
+    if (mVetChaves[Esquerdo(i)] > mVetChaves[Direito(i)]) {
+        mVetChaves[i] = mVetChaves[Esquerdo(i)];
     } else {
-        mVetChaves[i] = mVetChaves[dir];
+        mVetChaves[i] = mVetChaves[Direito(i)];
     }
 }
 
-void Torneio::ArrumarSubindo(int i) {
-    // Implementado por Lucas Neves
-    TChave p = Pai(i);
-    
-    if (mVetChaves[i] > mVetChaves[p]) {
-        swap(mVetChaves[i], mVetChaves[p]);
-        ArrumarSubindo(p);
+void Torneio::ArrumarSubindo(int i) { // Implementado por Lucas Neves
+    if (mVetChaves[Pai(i)] < mVetChaves[i]) {
+        swap(mVetChaves[Pai(i)], mVetChaves[i]);
+        ArrumarSubindo(Pai(i));
     }
 }
 
 void Torneio::ArrumarTudo() {
-    // completar aqui
+    for (int i = (mTamanho-1)/2; i < mTamanho; ++i) {
+        ArrumarSubindo(i);
+    } 
 }
 
 void Torneio::CalcularEspacoDeArmazenamento(int tam) {
@@ -118,18 +112,28 @@ int Torneio::Direito(int i) {
     return 2*i+2;
 }
 
-TChave Torneio::Raiz() {
+TChave Torneio::Raiz() { // Implementado por Lucas Neves
     if (mTamanho == mNroTorneios) {
-        throw runtime_error("Impossível acessar raiz de torneio vazio.");
-    } else { // Implementado por Lucas Neves
+        throw runtime_error("ImpossÃ­vel acessar raiz de torneio vazio.");
+    } else {
         return mVetChaves[0];
     }
 }
 
-TChave Torneio::Retirar() {
-    if (mTamanho == mNroTorneios)
-        throw runtime_error("Impossível retirar de torneio vazio.");
-    // completar aqui
+TChave Torneio::Retirar() { // Implementado por Lucas Neves
+    if (mTamanho == mNroTorneios) {
+        throw runtime_error("ImpossÃ­vel retirar de torneio vazio.");
+    } else {
+        TChave raiz = mVetChaves[0];
+        
+        if (mVetChaves[0] == mVetChaves[Direito(0)]) {
+            mVetChaves[0] = mVetChaves[Esquerdo(0)];
+        } else {
+            mVetChaves[0] = mVetChaves[Direito(0)];
+        }
+        
+        return raiz;
+    }
 }
 
 bool Torneio::Vazio() {
@@ -137,9 +141,20 @@ bool Torneio::Vazio() {
 }
 
 void Torneio::Inserir(TChave chave) {
-    if (mTamanho == mCapacidade)
-        throw runtime_error("Impossível inserir em torneio cheio.");
-    // completar aqui
+    if (mTamanho == mCapacidade) {
+        throw runtime_error("ImpossÃ­vel inserir em torneio cheio.");
+    } else {
+        bool inseriu = false;
+        
+        for (int i = mTamanho - 1; i >= (mTamanho-1)/2 && inseriu == false; --i) {
+            if (mVetChaves[i] == mMenor) {
+                mVetChaves[i] = chave;
+                inseriu = true;
+            }
+        }
+        
+        ArrumarTudo();
+    }
 }
 
 std::ostream& operator << (std::ostream& saida, const Torneio& t) {
@@ -199,6 +214,6 @@ int main() {
             case 'e': // Escrever
                 cout << torneio << endl;
         }
-    } while (operacao != 'f'); // Finalizar execução
+    } while (operacao != 'f'); // Finalizar execuÃ§Ã£o
     return 0;
 }
