@@ -152,6 +152,7 @@ void Torneio::Inserir(TChave chave) {
                 inseriu = true;
             }
         }
+        ++mTamanho;
         
         ArrumarTudo();
     }
