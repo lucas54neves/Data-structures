@@ -53,12 +53,12 @@ NohAVL::NohAVL(TChave c, const TValor& v) {
     mPtEsq = NULL;
     mPtDir = NULL;
     mPtPai = NULL;
+    mAltura = 1;
 }
 
 NohAVL::~NohAVL() {
 	// Modificado
-	delete mPtEsq;
-	delete mPtDir;
+	DesalocarFilhosRecursivo();
 }
 
 // Faz as rotações e ajustes necessários inclusive do nó pai. Atualiza a altura.
@@ -92,7 +92,9 @@ void NohAVL::AtualizarAltura() {
 
 // Desaloca todos os descendentes.
 void NohAVL::DesalocarFilhosRecursivo() {
-    #warning NohAVL::DesalocarFilhosRecursivo não implementado.
+    // Modificado
+    delete mPtEsq;
+    delete mPtDir;
 }
 
 // Calcula e retorna o fator de balanceamento do nó.
@@ -107,10 +109,12 @@ int NohAVL::FatorBalanceamento() {
 NohAVL* NohAVL::InserirRecursivo(NohAVL* ptNoh) {
 	// Modificado
 	if (this->mChave > ptNoh->mChave) {
-		this->mPtEsq = InserirRecursivo(ptNoh);	
+		this->mPtEsq = this->mPtEsq->InserirRecursivo(ptNoh);	
 	} else {
-		this->mPtDir = InserirRecursivo(ptNoh);
+		this->mPtDir = this->mPtDir->InserirRecursivo(ptNoh);
 	}
+	
+	return ArrumarBalanceamento();
 }
 
 // Rotaciona a subárvore à direita. Retorna a nova raiz da subárvore.
@@ -178,7 +182,8 @@ NohAVL* NohAVL::RotacionarEsquerda() {
 
 // Substitui um dos filhos por um novo nó.
 void NohAVL::TrocarFilho(NohAVL* ptAntigo, NohAVL* ptNovo) {
-    #warning NohAVL::TrocarFilho não implementado.
+    // Modificado
+    
 }
 
 // Escreve o conteúdo de um nó no formato [altura:chave/valor].
@@ -193,11 +198,13 @@ std::ostream& operator<<(std::ostream& saida, NohAVL* ptNoh) {
 
 // === Classe AVL =================================================================================
 AVL::AVL() {
-    #warning AVL::AVL não implementado.
+    // Modificado
+    mPtRaiz = NULL;
 }
 
 AVL::~AVL() {
-    #warning AVL::~AVL não implementado.
+	// Modificado
+	delete mPtRaiz;
 }
 
 // Escreve o conteúdo da árvore nível a nível, na saída de dados informada.
@@ -228,7 +235,13 @@ void AVL::EscreverNivelANivel(ostream& saida) {
 
 // Insere um par chave/valor na árvore.
 void AVL::Inserir(TChave chave, const TValor& valor) {
-    #warning AVL::Inserir não implementado.
+    // Modificado
+    NohAVL* novoNoh = new NohAVL(chave, valor);
+    if (mPtRaiz == NULL) {
+		mPtRaiz = novoNoh;
+	} else {
+		mPtRaiz = mPtRaiz->InserirRecursivo(novoNoh);
+	}
 }
 
 // === Programa ===================================================================================
