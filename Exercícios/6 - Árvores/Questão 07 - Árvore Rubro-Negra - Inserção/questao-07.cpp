@@ -85,9 +85,11 @@ void ArvoreRN::Inserir(unsigned chave, TValor valor) {
 		mRaiz->mCor = PRETO;
 	} else {
 		Noh* inter = mRaiz;
+		Noh* aux;
 		bool esq;
 		
 		while (inter != NULL) {
+			aux = inter;
 			if (novoNoh->mChave < inter->mChave) {
 				inter = inter->mEsq;
 				esq = true;
@@ -96,6 +98,8 @@ void ArvoreRN::Inserir(unsigned chave, TValor valor) {
 				esq = false;
 			}
 		}
+		
+		inter = aux;
 		
 		if (esq) {
 			inter->mEsq = novoNoh;
