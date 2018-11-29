@@ -101,6 +101,7 @@ Noh* Arvore234::insereAux(Noh* umNoh, Dado umItem, Dado& itemPromovido) {
 			} else {
 				insereEmNohFolhaNaoCheio(novoNoh, umItem);
 			}
+			return novoNoh;
 		}
 	} else {
 		int i = umNoh->num - 1;
@@ -108,7 +109,7 @@ Noh* Arvore234::insereAux(Noh* umNoh, Dado umItem, Dado& itemPromovido) {
 			i--;
 		}
 		
-		Noh* nohAux = insereAux(umNoh, umItem, itemPromovido);
+		Noh* nohAux = insereAux(umNoh->filhos[i+1], umItem, itemPromovido);
 		
 		if (nohAux) {
 			Dado itemAux = itemPromovido;
@@ -144,7 +145,7 @@ Noh* Arvore234::divideNoh(Noh* umNoh, Dado umItem, Dado& itemPromovido) {
 	
 	if (!umNoh->folha) {
 		for (int i = 0; i < MEIO + 1; i++) {
-			novoNoh->filhos[i] = umNoh->filhos[i+MEIO+1];
+			novoNoh->filhos[i] = umNoh->filhos[MEIO+1+i];
 		}
 	}
 	
@@ -182,8 +183,7 @@ Dado* Arvore234::minimo() {
     if (raiz == NULL) {
 		return NULL;
 	} else {
-		Dado* menor = minimoAux(raiz);
-		return menor;
+		return minimoAux(raiz);
 	}
 }
 
@@ -201,8 +201,7 @@ Dado* Arvore234::maximo() {
     if (raiz == NULL) {
 		return NULL;
 	} else {
-		Dado* maior = maximoAux(raiz);
-		return maior;
+		return maximoAux(raiz);
 	}
 }
 
