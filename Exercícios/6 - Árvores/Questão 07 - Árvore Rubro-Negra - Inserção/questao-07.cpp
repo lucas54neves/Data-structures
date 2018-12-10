@@ -116,7 +116,17 @@ void ArvoreRN::Inserir(unsigned chave, TValor valor) {
 // procedimento para manter balanceamento após inserção
 void ArvoreRN::ArrumarInsercao(Noh* umNoh) {
 	// Modificado
-	if (umNoh->mPai->mCor == VERMELHO) {
+	if (umNoh == mRaiz && umNoh->mCor == VERMELHO) {
+		umNoh->mCor = PRETO;
+	} else if (umNoh->Tio() != NULL) {
+		if (umNoh->Tio()->mCor == PRETA) {
+			// Rotação
+		} else {
+			// Mudança de cor
+		}
+	}
+	
+	/*if (umNoh->mPai->mCor == VERMELHO) {
 		// Caso 1
 		if (umNoh->mPai->mCor == VERMELHO
 		 && umNoh->Tio()->mCor == VERMELHO
@@ -172,7 +182,7 @@ void ArvoreRN::ArrumarInsercao(Noh* umNoh) {
 			}
 		}
 		mRaiz->mCor = PRETO;
-	}
+	}*/
 }
 
 // rotação à esquerda, muda a raiz se necessário

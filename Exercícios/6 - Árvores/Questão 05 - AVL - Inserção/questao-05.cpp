@@ -23,7 +23,7 @@ class NohAVL {
         NohAVL* InserirRecursivo(NohAVL* ptNoh);
         NohAVL* RotacionarEsquerda();
         NohAVL* RotacionarDireita();
-        void TrocarFilho(NohAVL* ptAntigo, NohAVL* ptNovo);
+        //void TrocarFilho(NohAVL* ptAntigo, NohAVL* ptNovo);
         TChave mChave;
         TValor mValor;
         NohAVL* mPtEsq;
@@ -67,26 +67,41 @@ NohAVL* NohAVL::ArrumarBalanceamento() {
 	// Modificado
 	AtualizarAltura();
 	
-	if (FatorBalanceamento() >= -1 && FatorBalanceamento() <= 1) {
-		return this;
-	} else if (FatorBalanceamento() > 1 && mPtEsq->FatorBalanceamento() >= 0) {
+	if (FatorBalanceamento() > 1 && mPtEsq->FatorBalanceamento() >= 0) {
 		return RotacionarDireita();
-	} else if (FatorBalanceamento() > 1 && mPtEsq->FatorBalanceamento() < 0) {
+	}
+	
+	if (FatorBalanceamento() > 1 && mPtEsq->FatorBalanceamento() < 0) {
 		mPtEsq = mPtEsq->RotacionarEsquerda();
 		return RotacionarDireita();
-	} else if (FatorBalanceamento() < -1 && mPtDir->FatorBalanceamento() >= 0) {
+	}
+	
+	if (FatorBalanceamento() < -1 && mPtDir->FatorBalanceamento() >= 0) {
 		return RotacionarEsquerda();
-	} else { // if (this->FatorBalanceamento() < -1 && this->mPtDir->FatorBalanceamento < 0)
+	}
+	
+	if (FatorBalanceamento() < -1 && mPtDir->FatorBalanceamento() < 0) {
 		mPtDir = mPtDir->RotacionarDireita();
 		return RotacionarEsquerda();
 	}
+	
+	return this;
 }
 
 // Calcula e atualiza a altura de um nó.
 void NohAVL::AtualizarAltura() {
 	// Modificado
-	int altEsq = mPtEsq->mAltura;
-	int altDir = mPtDir->mAltura;
+	int altEsq = 0;
+	int altDir = 0;
+	
+	if (mPtEsq != NULL) {
+		altEsq = mPtEsq->mAltura;
+	}
+	
+	if (mPtDir != NULL) {
+		altDir = mPtDir->mAltura;
+	}
+	
 	mAltura = 1 + max(altEsq, altDir);
 }
 
@@ -100,18 +115,35 @@ void NohAVL::DesalocarFilhosRecursivo() {
 // Calcula e retorna o fator de balanceamento do nó.
 int NohAVL::FatorBalanceamento() {
 	// Modificado
-	int altEsq = mPtEsq->mAltura;
-	int altDir = mPtDir->mAltura;
+	int altEsq = 0;
+	int altDir = 0;
+	
+	if (mPtEsq != NULL) {
+		altEsq = mPtEsq->mAltura;
+	}
+	
+	if (mPtDir != NULL) {
+		altDir = mPtDir->mAltura;
+	}
+	
 	return altEsq - altDir;
 }
 
 // Insere um nó numa subárvore.
 NohAVL* NohAVL::InserirRecursivo(NohAVL* ptNoh) {
 	// Modificado
-	if (this->mChave > ptNoh->mChave) {
-		this->mPtEsq = this->mPtEsq->InserirRecursivo(ptNoh);	
+	NohAVL* inter = this;
+	
+	if (inter == NULL) {
+		return ptNoh;
 	} else {
-		this->mPtDir = this->mPtDir->InserirRecursivo(ptNoh);
+		if (this->mChave > ptNoh->mChave) {
+			mPtEsq = mPtEsq->InserirRecursivo(ptNoh);
+			mPtEsq->mPtPai = this;	
+		} else {
+			mPtDir = mPtDir->InserirRecursivo(ptNoh);
+			mPtDir->mPtPai = this;
+		}
 	}
 	
 	return ArrumarBalanceamento();
@@ -130,16 +162,16 @@ NohAVL* NohAVL::RotacionarDireita() {
 	
 	aux->mPtPai = this->mPtPai;
 	
-	if (this->mPtPai == NULL) {
-		if (this == this->mPtPai->mPtEsq) {
-			this->mPtPai->mPtEsq = aux;
+	if (this->mPtPai != NULL) {
+		if (this == mPtPai->mPtEsq) {
+			mPtPai->mPtEsq = aux;
 		} else {
-			this->mPtPai->mPtDir = aux;
+			mPtPai->mPtDir = aux;
 		}
 	}
 	
 	aux->mPtDir = this;
-	this->mPtPai = aux;
+	mPtPai = aux;
 	
 	aux->AtualizarAltura();
 	this->AtualizarAltura();
@@ -150,12 +182,8 @@ NohAVL* NohAVL::RotacionarDireita() {
 // Rotaciona a subárvore à esquerda. Retorna a nova raiz da subárvore.
 NohAVL* NohAVL::RotacionarEsquerda() {
 	// Modificado
-	NohAVL* aux = this->mPtDir;
-	this->mPtDir = mPtEsq;
-	
-	if (aux->mPtEsq != NULL) {
-		aux->mPtEsq = this;
-	}
+	NohAVL* aux = mPtDir;
+	mPtDir = aux->mPtEsq;
 	
 	if (aux->mPtEsq != NULL) {
 		aux->mPtEsq->mPtPai = this;
@@ -163,28 +191,28 @@ NohAVL* NohAVL::RotacionarEsquerda() {
 	
 	aux->mPtPai = this->mPtPai;
 	
-	if (this->mPtPai != NULL) {
-		if (this == this->mPtPai->mPtEsq) {
-			this->mPtPai->mPtEsq = aux;
-		} else {
-			this->mPtPai->mPtDir = aux;
-		}
+	if (this->mPtPai == NULL) {
+		mPtPai = aux;
+	} else if (this == this->mPtPai->mPtEsq) {
+		mPtPai->mPtEsq = aux;
+	} else {
+		mPtPai->mPtDir = aux;
 	}
 	
 	aux->mPtEsq = this;
-	this->mPtPai = aux;
+	mPtPai = aux;
 	
-	this->AtualizarAltura();
+	AtualizarAltura();
 	aux->AtualizarAltura();
 	
 	return aux;
 }
 
 // Substitui um dos filhos por um novo nó.
-void NohAVL::TrocarFilho(NohAVL* ptAntigo, NohAVL* ptNovo) {
+/*void NohAVL::TrocarFilho(NohAVL* ptAntigo, NohAVL* ptNovo) {
     // Modificado
     
-}
+}*/
 
 // Escreve o conteúdo de um nó no formato [altura:chave/valor].
 // Escreve "[]" se o ponteiro recebido for NULL.

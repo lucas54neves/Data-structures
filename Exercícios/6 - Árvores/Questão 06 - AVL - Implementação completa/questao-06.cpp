@@ -64,11 +64,29 @@ NohAVL::NohAVL(TChave c, const TValor& v)
 }
 
 NohAVL::~NohAVL() {
+	// Modificado
+	DesalocarFilhosRecursivo();
 }
 
 // Faz as rotações e ajustes necessários inclusive do nó pai. Atualiza a altura.
 // Retorna o ponteiro para o nó que ficar na posição dele após os ajustes.
 NohAVL* NohAVL::ArrumarBalanceamento() {
+	// Modificado
+	AtualizarAltura();
+	
+	if (FatorBalanceamento() > 1 && mPtEsq->FatorBalanceamento() >= 0) {
+		RotacionarDireita();
+	} else if (FatorBalanceamento() > 1 && mPtEsq->FatorBalanceamento() < 0) {
+		mPtEsq = mPtEsq->RotacionarEsquerda();
+		RotacionarDireita();
+	} else if (FatorBalanceamento() < -1 && mPtDir->FatorBalanceamento() >= 0) {
+		RotacionarEsquerda();
+	} else if (FatorBalanceamento() < -1 && mPtDir->FatorBalanceamento() < 0) {
+		mPtDir = mPtDir->RotacionarDireita();
+		RotacionarEsquerda();
+	} else {
+		return this;
+	}
 }
 
 // Calcula e atualiza a altura de um nó.
@@ -78,11 +96,15 @@ void NohAVL::AtualizarAltura() {
 
 // Desaloca todos os descendentes.
 void NohAVL::DesalocarFilhosRecursivo() {
-    #warning NohAVL::DesalocarFilhosRecursivo não implementado.
+	// Modificado
+    delete mPtDir;
+    delete mPtEsq;
 }
 
 // Calcula e retorna o fator de balanceamento do nó.
 int NohAVL::FatorBalanceamento() {
+	// Modificado
+	return (mPtEsq->mAltura - mPtDir->mAltura);
 }
 
 // Insere um nó numa subárvore. Retorna o ponteiro para o nó que ficou no lugar do que recebeu
@@ -92,6 +114,14 @@ NohAVL* NohAVL::InserirRecursivo(NohAVL* ptNoh) {
 
 // Busca o nó que tem a menor chave. Retorna o ponteiro para ele.
 NohAVL* NohAVL::MenorRecursivo() {
+	// Modificado
+	NohAVL* inter = this;
+	
+	while (inter->mPtEsq != NULL) {
+		inter = inter->mPtEsq;
+	}
+	
+	return inter;
 }
 
 // Remove o nó. Retorna o ponteiro para o nó que ficou no lugar dele.
@@ -111,6 +141,8 @@ NohAVL* NohAVL::RotacionarDireita() {
 
 // Rotaciona à esquerda a subárvore. Retorna a nova raiz da subárvore.
 NohAVL* NohAVL::RotacionarEsquerda() {
+	NohAVL* nohAux = mPtDir;
+	u
 }
 
 // Atualiza todas as ligações, para que ptNoh, fique no lugar deste nó.
@@ -133,6 +165,16 @@ void NohAVL::TrocarFilho(NohAVL* ptAntigo, NohAVL* ptNovo) {
 // Busca recursivamente uma dada chave e retorna o valor associado a ela.
 // Levanta exceção se não encontrar a chave.
 TValor& NohAVL::Valor(TChave chave) {
+	// Modificado
+	if (chave == mChave) {
+		return mValor;
+	} else if (chave < mChave) {
+		return mPtEsq->Valor(chave);
+	} else if (chave > mChave){
+		return mPtDir->Valor(chave);
+	} else {
+		throw runtime_error("Chave não encontrada.");
+	}
 }
 
 // Escreve o conteúdo de um nó no formato [altura:chave/valor].
